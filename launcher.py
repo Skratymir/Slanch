@@ -30,15 +30,21 @@ class Launcher():
     def refresh_login(self):
         try:
             with open("login.pkl", "rb") as f:
-                login_data = pickle.load(f)
-            minecraft_launcher_lib.microsoft_account.complete_refresh(self.CLIENT_ID, self.SECRET, self.REDIRECT_URL, login_data["refresh_token"])
-            print("Logged in as {}".format(login_data["name"]))
+                self.login_data = pickle.load(f)
+            minecraft_launcher_lib.microsoft_account.complete_refresh(self.CLIENT_ID, self.SECRET, self.REDIRECT_URL, self.login_data["refresh_token"])
+            print("Logged in as {}".format(self.login_data["name"]))
             self.logged_in = True
         except FileNotFoundError:
             print("No login data detected. Please login from the launcher")
             
     def check_login(self):
-        if self.logged_in:
+        if self.logged_in and self.login_data != None:
             return True
+        else:
+            return False
+        
+    def get_login_data(self):
+        if self.check_login():
+            return self.login_data
         else:
             return False

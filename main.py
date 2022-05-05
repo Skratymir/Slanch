@@ -1,6 +1,6 @@
-import tkinter
 import launcher
-from threading import Thread
+import tkinter
+import tkinter.messagebox
 
 class Window(tkinter.Tk):
     def __init__(self, slanch):
@@ -69,24 +69,31 @@ class ProfilesPage(tkinter.Frame):
         
 class SettingsPage(tkinter.Frame):
     def __init__(self, parent, controller, slanch):
+        global login_button
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
-        self.slanch = launcher.Launcher
         
-        self.launch_page_button = tkinter.Button(self, command=lambda: controller.set_page("LaunchPage"))
-        self.profiles_page_button = tkinter.Button(self, command=lambda: controller.set_page("ProfilesPage"))
-        self.settings_page_button = tkinter.Button(self)
+        launch_page_button = tkinter.Button(self, command=lambda: controller.set_page("LaunchPage"))
+        profiles_page_button = tkinter.Button(self, command=lambda: controller.set_page("ProfilesPage"))
+        settings_page_button = tkinter.Button(self)
         
-        self.launch_page_button.place(relx=0.165, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        self.profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        self.settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
+        launch_page_button.place(relx=0.165, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
+        profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
+        settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         
-        self.login_button = tkinter.Button(self, text="Login", command=lambda: slanch.login())
+        login_button = tkinter.Button(self, text="Login", command=lambda: slanch.login())
         
-        self.login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
+        login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
+        
+    def update_login_button():   
+        global login_button
+        if slanch.check_login() == True:
+            login_button["state"] = tkinter.DISABLED
+            login_button["text"] = "Logged in as {}".format(slanch.get_login_data()["name"])
 
 if __name__ == "__main__":
     slanch = launcher.Launcher()
     window = Window(slanch)
-    Thread(target=slanch.refresh_login).start()
+    slanch.refresh_login()
+    SettingsPage.update_login_button()
     window.mainloop()
