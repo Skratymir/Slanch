@@ -4,8 +4,9 @@ login.pkl
 # profiles
 profiles/*
 
-# logs
+# other stuff
 logs/
+test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
