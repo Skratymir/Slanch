@@ -94,8 +94,6 @@ class Launcher():
                     "uuid": self.login_data["id"],
                     "token": self.login_data["access_token"],
                     "jvmArguments": profile["args"]
-                    # "executablePath": "C:/Program Files/Java/jdk-17.0.2/bin/javaw.exe"
-                    # "executablePath": "C:/Program Files (x86)/Minecraft Launcher/runtime/jre-legacy/windows-x64/jre-legacy/bin/javaw.exe"
                 }
                 minecraft_launch_command = minecraft_launcher_lib.command.get_minecraft_command(
                     profile["version"], 
