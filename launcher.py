@@ -1,6 +1,7 @@
 import minecraft_launcher_lib
 import sys
 import pickle
+import os
 
 class Launcher():
     def __init__(self):
@@ -36,6 +37,8 @@ class Launcher():
             self.logged_in = True
         except FileNotFoundError:
             print("No login data detected. Please login from the launcher")
+        except KeyError:
+            self.logged_in = False
             
     def check_login(self):
         if self.logged_in and self.login_data != None:
@@ -48,3 +51,37 @@ class Launcher():
             return self.login_data
         else:
             return False
+        
+    def load_all_installed_versions(self):
+        versions = []
+        for version in minecraft_launcher_lib.utils.get_installed_versions(self.minecraft_directory):
+            versions.append(version["id"])
+        return versions
+
+    def load_all_profiles(self):
+        profiles = []
+        for object in os.scandir("./profiles"):
+            if object.is_dir():
+                with open(f"./profiles/{object.name}/profile.pkl", "rb") as f:
+                    profile = pickle.load(f)
+                    profiles.append(profile)
+        return profiles
+    
+    def load_all_profiles_by_name(self):
+        profiles = []
+        for object in os.scandir("./profiles"):
+            if object.is_dir():
+                with open(f"./profiles/{object.name}/profile.pkl", "rb") as f:
+                    profile = pickle.load(f)
+                    profiles.append(profile["id"])
+        return profiles
+    
+    def create_new_profile(self, name, version, args):
+        os.mkdir(f"./profiles/{name}")
+        profile = {
+            "id": name,
+            "version": version,
+            "args": args
+        }
+        with open(f"./profiles/{name}/profile.pkl", "wb") as f:
+            pickle.dump(profile, f)
