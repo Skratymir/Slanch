@@ -2,6 +2,7 @@ import minecraft_launcher_lib
 import sys
 import pickle
 import os
+import subprocess
 
 class Launcher():
     def __init__(self):
@@ -85,3 +86,22 @@ class Launcher():
         }
         with open(f"./profiles/{name}/profile.pkl", "wb") as f:
             pickle.dump(profile, f)
+            
+    def launch_profile(self, id):
+        for profile in self.load_all_profiles():
+            if id == profile["id"]:
+                minecraft_launch_options = {
+                    "username": self.login_data["name"],
+                    "uuid": self.login_data["id"],
+                    "token": self.login_data["access_token"],
+                    "jvmArguments": profile["args"],
+                    "executablePath": "C:/Program Files/Java/jdk-17.0.2/bin/javaw.exe"
+                }
+                minecraft_launch_command = minecraft_launcher_lib.command.get_minecraft_command(
+                    "1.8.9", 
+                    self.minecraft_directory, 
+                    minecraft_launch_options
+                )
+                minecraft_launcher_lib.microsoft_account.complete_refresh(self.CLIENT_ID, self.SECRET, self.REDIRECT_URL, self.login_data["refresh_token"])
+                print("Refreshed Login. Starting Version {}".format(profile["version"]))
+                subprocess.call(minecraft_launch_command)

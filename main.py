@@ -41,7 +41,6 @@ class Window(tkinter.Tk):
     def set_page(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
-        print(f"Switching to {page_name}")
         
 class LaunchPage(tkinter.Frame):
     def __init__(self, parent, controller):
@@ -56,12 +55,12 @@ class LaunchPage(tkinter.Frame):
         self.profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         self.settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         
-        self.launch_button = tkinter.Button(self, text="Launch")
+        self.launch_button = tkinter.Button(self, text="Launch", command=lambda: slanch.launch_profile(self.variable.get()))
         
         options = slanch.load_all_profiles_by_name()
-        variable = tkinter.StringVar(self)
-        variable.set(options[0])
-        self.profile_selection = tkinter.OptionMenu(self, variable, *options)
+        self.variable = tkinter.StringVar(self)
+        self.variable.set(options[0])
+        self.profile_selection = tkinter.OptionMenu(self, self.variable, *options)
         
         self.launch_button.place(relx=0.5, rely=0.5, relwidth=0.3, relheight=0.3, anchor="center")
         self.profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
