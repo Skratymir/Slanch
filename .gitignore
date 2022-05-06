@@ -1,6 +1,9 @@
 # Login information
 login.pkl
 
+# profiles
+profiles/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
