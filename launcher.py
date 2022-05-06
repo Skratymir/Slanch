@@ -3,7 +3,6 @@ import sys
 import pickle
 import os
 import subprocess
-import main
 
 CLIENT_ID = "9ff1e48d-5b3c-42bb-883f-fd0426a583c4"
 SECRET = "7Hw8Q~1pfZRlrL2Pfo9QEF~cZahZw5pxhRDv0b0G"
@@ -13,6 +12,7 @@ login_data = None
 logged_in = False
     
 def login():
+    global logged_in, login_data
     print(f"Open {minecraft_launcher_lib.microsoft_account.get_login_url(CLIENT_ID, REDIRECT_URL) } in your Browser, login and paste the url you are redirected to here: ")
     code_url = input()
     
@@ -26,16 +26,16 @@ def login():
         pickle.dump(login_data, f)
     print("Login sucessful")
     logged_in = True
-    main.update_login_button()
     
 def logout():
+    global logged_in, login_data
     print("Logging out...")
     logged_in = False
     login_data = None
     os.remove("login.pkl")
-    main.update_login_button()
 
 def refresh_login():
+    global logged_in, login_data
     try:
         with open("login.pkl", "rb") as f:
             login_data = pickle.load(f)
@@ -48,6 +48,7 @@ def refresh_login():
         logged_in = False
         
 def check_login():
+    global logged_in, login_data
     if logged_in and login_data != None:
         return True
     else:

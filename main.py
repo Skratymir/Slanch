@@ -38,6 +38,7 @@ class Window(tkinter.Tk):
         self.frames["ProfilesPage"].create_frame()
         self.frames["ProfileCreationPage"].resize_font(0)
         
+        
     def set_page(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
@@ -123,20 +124,16 @@ class SettingsPage(tkinter.Frame):
         profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         
-        login_button = tkinter.Button(self, text="Login", command=lambda: launcher.login())
-        logout_button = tkinter.Button(self, text="Logout", command=lambda: launcher.logout())
+        self.login_button = tkinter.Button(self, text="Login", command=lambda: self.login_out())
         
-        login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
-        logout_button.place(relx=0.5, rely=0.4, relwidth=0.3, relheight=0.15, anchor="n")
+        self.login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
         
-    def update_login_button():   
-        global login_button
-        if launcher.check_login() == True:
-            login_button["state"] = tkinter.DISABLED
-            login_button["text"] = "Logged in as {}".format(launcher.get_login_data()["name"])
+    def login_out(self):
+        if launcher.check_login():
+            launcher.logout()
         else:
-            login_button["state"] = tkinter.NORMAL
-            login_button["text"] = "Login"
+            launcher.login()
+        update_login_button()
             
 class ProfileCreationPage(tkinter.Frame):
     def __init__(self, parent, controller):
@@ -186,7 +183,10 @@ class ProfileCreationPage(tkinter.Frame):
         self.controller.set_page("LaunchPage")
             
 def update_login_button():
-    SettingsPage.update_login_button()
+    if launcher.check_login() == True:
+        window.frames["SettingsPage"].login_button["text"] = "Logout"
+    else:
+        window.frames["SettingsPage"].login_button["text"] = "Login"
 
 if __name__ == "__main__":
     window = Window()
