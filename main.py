@@ -3,7 +3,7 @@ import tkinter
 from tkinter import font as tkFont
 
 class Window(tkinter.Tk):
-    def __init__(self, slanch):
+    def __init__(self):
         tkinter.Tk.__init__(self)
         self.title("Slanch")
         self.geometry(
@@ -25,8 +25,8 @@ class Window(tkinter.Tk):
         
         self.frames["LaunchPage"] = LaunchPage(parent=container, controller=self)
         self.frames["ProfilesPage"] = ProfilesPage(parent=container, controller=self)
-        self.frames["SettingsPage"] = SettingsPage(parent=container, controller=self, slanch=slanch)
-        self.frames["ProfileCreationPage"] = ProfileCreationPage(parent=container, controller=self, slanch=slanch)
+        self.frames["SettingsPage"] = SettingsPage(parent=container, controller=self)
+        self.frames["ProfileCreationPage"] = ProfileCreationPage(parent=container, controller=self)
         
         self.frames["LaunchPage"].grid(row=0, column=0, sticky="nsew")
         self.frames["ProfilesPage"].grid(row=0, column=0, sticky="nsew")
@@ -55,9 +55,9 @@ class LaunchPage(tkinter.Frame):
         self.profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         self.settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         
-        self.launch_button = tkinter.Button(self, text="Launch", command=lambda: slanch.launch_profile(self.variable.get()))
+        self.launch_button = tkinter.Button(self, text="Launch", command=lambda: launcher.launch_profile(self.variable.get()))
         
-        options = slanch.load_all_profiles_by_name()
+        options = launcher.load_all_profiles_by_name()
         self.variable = tkinter.StringVar(self)
         self.variable.set(options[0])
         self.profile_selection = tkinter.OptionMenu(self, self.variable, *options)
@@ -91,7 +91,7 @@ class ProfilesPage(tkinter.Frame):
         
         self.profiles_canvas.configure(yscrollcommand=(self.profiles_scrollbar.set))
         
-        self.profiles = slanch.load_all_profiles()
+        self.profiles = launcher.load_all_profiles()
         
         for profile in self.profiles:
             frame = tkinter.Frame(self.profiles_frame)
@@ -110,7 +110,7 @@ class ProfilesPage(tkinter.Frame):
         self.profiles_canvas.create_window((0, 0), window=self.profiles_frame, anchor="nw", width=self.profiles_canvas.winfo_width())     
         
 class SettingsPage(tkinter.Frame):
-    def __init__(self, parent, controller, slanch):
+    def __init__(self, parent, controller):
         global login_button
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
@@ -123,24 +123,29 @@ class SettingsPage(tkinter.Frame):
         profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
         
-        login_button = tkinter.Button(self, text="Login", command=lambda: slanch.login())
+        login_button = tkinter.Button(self, text="Login", command=lambda: launcher.login())
+        logout_button = tkinter.Button(self, text="Logout", command=lambda: launcher.logout())
         
         login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
+        logout_button.place(relx=0.5, rely=0.4, relwidth=0.3, relheight=0.15, anchor="n")
         
     def update_login_button():   
         global login_button
-        if slanch.check_login() == True:
+        if launcher.check_login() == True:
             login_button["state"] = tkinter.DISABLED
-            login_button["text"] = "Logged in as {}".format(slanch.get_login_data()["name"])
+            login_button["text"] = "Logged in as {}".format(launcher.get_login_data()["name"])
+        else:
+            login_button["state"] = tkinter.NORMAL
+            login_button["text"] = "Login"
             
 class ProfileCreationPage(tkinter.Frame):
-    def __init__(self, parent, controller, slanch):
+    def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
         
         self.font = ("Times new Roman", 12)
         
-        all_installed_versions = slanch.load_all_installed_versions()
+        all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
         self.selected_version.set(all_installed_versions[0])
         default_java_args = "-Xmx2G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M"
@@ -153,7 +158,7 @@ class ProfileCreationPage(tkinter.Frame):
         self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
         self.profile_args_input = tkinter.Entry(self)
         self.profile_args_input.insert(-1, default_java_args)
-        self.profile_creation_button = tkinter.Button(self, text="Create", command=self.slanch_create_profile)
+        self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
         
         self.title_label.place(relx=0.5, rely=0, relwidth=1, relheight=0.2, anchor="n")
         self.profile_name_label.place(relx=0.1, rely=0.25, relwidth=0.3, relheight=0.2, anchor="nw")
@@ -170,22 +175,22 @@ class ProfileCreationPage(tkinter.Frame):
         self.profile_version_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_args_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         
-    def slanch_create_profile(self):
+    def launcher_create_profile(self):
         name = self.profile_name_input.get()
         version = self.selected_version.get()
         args = []
         for argument in self.profile_args_input.get().split(" "):
             args.append(argument)
             
-        slanch.create_new_profile(name, version, args)
+        launcher.create_new_profile(name, version, args)
         self.controller.set_page("LaunchPage")
             
-        
+def update_login_button():
+    SettingsPage.update_login_button()
 
 if __name__ == "__main__":
-    slanch = launcher.Launcher()
-    window = Window(slanch)
-    slanch.refresh_login()
-    SettingsPage.update_login_button()
+    window = Window()
+    launcher.refresh_login()
+    update_login_button()
     window.resizable(False, False)
     window.mainloop()
