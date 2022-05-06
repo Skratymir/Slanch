@@ -14,20 +14,19 @@ class Launcher():
         self.logged_in = False
         
     def login(self):
-        if self.check_login == False:
-            print(f"Open {minecraft_launcher_lib.microsoft_account.get_login_url(self.CLIENT_ID, self.REDIRECT_URL) } in your Browser, login and paste the url you are redirected to here: ")
-            code_url = input()
+        print(f"Open {minecraft_launcher_lib.microsoft_account.get_login_url(self.CLIENT_ID, self.REDIRECT_URL) } in your Browser, login and paste the url you are redirected to here: ")
+        code_url = input()
+        
+        if not minecraft_launcher_lib.microsoft_account.url_contains_auth_code(code_url):
+            print("Url invalid")
+            sys.exit(1)
             
-            if not minecraft_launcher_lib.microsoft_account.url_contains_auth_code(code_url):
-                print("Url invalid")
-                sys.exit(1)
-                
-            auth_code = minecraft_launcher_lib.microsoft_account.get_auth_code_from_url(code_url)
-            login_data = minecraft_launcher_lib.microsoft_account.complete_login(self.CLIENT_ID, self.SECRET, self.REDIRECT_URL, auth_code)
-            with open("login.pkl", "wb") as f:
-                pickle.dump(login_data, f)
-            print("Login sucessful")
-            self.logged_in = True
+        auth_code = minecraft_launcher_lib.microsoft_account.get_auth_code_from_url(code_url)
+        login_data = minecraft_launcher_lib.microsoft_account.complete_login(self.CLIENT_ID, self.SECRET, self.REDIRECT_URL, auth_code)
+        with open("login.pkl", "wb") as f:
+            pickle.dump(login_data, f)
+        print("Login sucessful")
+        self.logged_in = True
     
     def refresh_login(self):
         try:
@@ -94,14 +93,21 @@ class Launcher():
                     "username": self.login_data["name"],
                     "uuid": self.login_data["id"],
                     "token": self.login_data["access_token"],
-                    "jvmArguments": profile["args"],
-                    "executablePath": "C:/Program Files/Java/jdk-17.0.2/bin/javaw.exe"
+                    "jvmArguments": profile["args"]
+                    # "executablePath": "C:/Program Files/Java/jdk-17.0.2/bin/javaw.exe"
+                    # "executablePath": "C:/Program Files (x86)/Minecraft Launcher/runtime/jre-legacy/windows-x64/jre-legacy/bin/javaw.exe"
                 }
                 minecraft_launch_command = minecraft_launcher_lib.command.get_minecraft_command(
-                    "1.8.9", 
+                    profile["version"], 
                     self.minecraft_directory, 
                     minecraft_launch_options
                 )
-                minecraft_launcher_lib.microsoft_account.complete_refresh(self.CLIENT_ID, self.SECRET, self.REDIRECT_URL, self.login_data["refresh_token"])
-                print("Refreshed Login. Starting Version {}".format(profile["version"]))
-                subprocess.call(minecraft_launch_command)
+                print("Verifying installation of version {}".format(profile["version"]))
+                minecraft_launcher_lib.install.install_minecraft_version(profile["version"], self.minecraft_directory)
+                print("Refreshing login")
+                self.refresh_login()
+                if self.logged_in == True:
+                    print("Refreshed Login. Starting Version {}".format(profile["version"]))
+                    subprocess.call(minecraft_launch_command)
+                else:
+                    print("Refresh unsucessful. Please login again from the settings page")
