@@ -128,7 +128,6 @@ class ProfilesPage(tkinter.Frame):
                     self.controller.frames["LaunchPage"].variable.set("None")
                 else:
                     self.controller.frames["LaunchPage"].variable.set(self.controller.frames["LaunchPage"].options[0])
-                print(self.controller.frames["LaunchPage"].options)
         
 class SettingsPage(tkinter.Frame):
     def __init__(self, parent, controller):
