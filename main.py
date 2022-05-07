@@ -52,9 +52,9 @@ class LaunchPage(tkinter.Frame):
         self.profiles_page_button = tkinter.Button(self, command=lambda: controller.set_page("ProfilesPage"))
         self.settings_page_button = tkinter.Button(self, command=lambda: controller.set_page("SettingsPage"))
         
-        self.launch_page_button.place(relx=0.165, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        self.profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        self.settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
+        self.launch_page_button.place(relx=0, rely=0, relwidth=0.33, relheight=0.15, anchor="nw")
+        self.profiles_page_button.place(relx=0.33, rely=0, relwidth=0.34, relheight=0.15, anchor="nw")
+        self.settings_page_button.place(relx=1, rely=0, relwidth=0.33, relheight=0.15, anchor="ne")
         
         self.launch_button = tkinter.Button(self, text="Launch", command=lambda: launcher.launch_profile(self.variable.get()))
         
@@ -75,9 +75,9 @@ class ProfilesPage(tkinter.Frame):
         self.profiles_page_button = tkinter.Button(self)
         self.settings_page_button = tkinter.Button(self, command=lambda: controller.set_page("SettingsPage"))
         
-        self.launch_page_button.place(relx=0.165, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        self.profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        self.settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
+        self.launch_page_button.place(relx=0, rely=0, relwidth=0.33, relheight=0.15, anchor="nw")
+        self.profiles_page_button.place(relx=0.33, rely=0, relwidth=0.34, relheight=0.15, anchor="nw")
+        self.settings_page_button.place(relx=1, rely=0, relwidth=0.33, relheight=0.15, anchor="ne")
         
         self.profiles_canvas = tkinter.Canvas(self)
         self.profiles_frame = tkinter.Frame(self.profiles_canvas)
@@ -120,9 +120,9 @@ class SettingsPage(tkinter.Frame):
         profiles_page_button = tkinter.Button(self, command=lambda: controller.set_page("ProfilesPage"))
         settings_page_button = tkinter.Button(self)
         
-        launch_page_button.place(relx=0.165, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        profiles_page_button.place(relx=0.5, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
-        settings_page_button.place(relx=0.83, rely=0, relwidth=0.33, relheight=0.15, anchor="n")
+        launch_page_button.place(relx=0, rely=0, relwidth=0.33, relheight=0.15, anchor="nw")
+        profiles_page_button.place(relx=0.33, rely=0, relwidth=0.34, relheight=0.15, anchor="nw")
+        settings_page_button.place(relx=1, rely=0, relwidth=0.33, relheight=0.15, anchor="ne")
         
         self.login_button = tkinter.Button(self, text="Login", command=lambda: self.login_out())
         
