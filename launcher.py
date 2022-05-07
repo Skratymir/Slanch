@@ -3,6 +3,9 @@ import sys
 import pickle
 import os
 import subprocess
+import random
+import string
+import pyAesCrypt
 
 CLIENT_ID = "9ff1e48d-5b3c-42bb-883f-fd0426a583c4"
 SECRET = "7Hw8Q~1pfZRlrL2Pfo9QEF~cZahZw5pxhRDv0b0G"
@@ -24,6 +27,7 @@ def login():
     login_data = minecraft_launcher_lib.microsoft_account.complete_login(CLIENT_ID, SECRET, REDIRECT_URL, auth_code)
     with open("login.data", "wb") as f:
         pickle.dump(login_data, f)
+    encrypt_login_data()
     print("Login sucessful")
     logged_in = True
     
@@ -37,11 +41,14 @@ def logout():
 def refresh_login():
     global logged_in, login_data
     try:
-        with open("login.data", "rb") as f:
-            login_data = pickle.load(f)
-        minecraft_launcher_lib.microsoft_account.complete_refresh(CLIENT_ID, SECRET, REDIRECT_URL, login_data["refresh_token"])
-        print("Logged in as {}".format(login_data["name"]))
-        logged_in = True
+        if os.path.exists("login.encrypted"):
+            decrypt_login_data()
+            with open("login.data", "rb") as f:
+                login_data = pickle.load(f)
+            encrypt_login_data()
+            minecraft_launcher_lib.microsoft_account.complete_refresh(CLIENT_ID, SECRET, REDIRECT_URL, login_data["refresh_token"])
+            print("Logged in as {}".format(login_data["name"]))
+            logged_in = True
     except FileNotFoundError:
         print("No login data detected. Please login from the launcher")
     except KeyError:
@@ -117,3 +124,23 @@ def launch_profile(id):
                 subprocess.call(minecraft_launch_command)
             else:
                 print("Refresh unsucessful. Please login again from the settings page")
+    
+def encrypt_login_data():
+    if not os.path.exists("key.key"):
+        chars = string.printable
+        key = "".join(random.choice(chars) for i in range(256))
+        with open("key.key", "w") as key_file:
+            key_file.write(key)
+    with open("key.key", "r") as key_file:
+        key = key_file.read()
+    pyAesCrypt.encryptFile("login.data", "login.encrypted", key)
+    os.remove("login.data")
+    
+def decrypt_login_data():
+    try:
+        with open("key.key", "r") as key_file:
+            key = key_file.read()
+        pyAesCrypt.decryptFile("login.encrypted", "login.data", key)
+        os.remove("login.encrypted")
+    except FileNotFoundError:
+        print("Key file not found. Please log in again from the Settings Page")
