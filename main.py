@@ -16,12 +16,12 @@ class Window(tkinter.Tk):
             "+" +
             str(round(self.winfo_screenheight() / 2 - self.winfo_screenheight() / 6))
             )
-        # Set up container to hold pages
+        
         container = tkinter.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        # Load pages into self.frames
+        
         self.frames = {}
         
         self.frames["LaunchPage"] = LaunchPage(parent=container, controller=self)
