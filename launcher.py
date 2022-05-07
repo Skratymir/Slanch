@@ -92,12 +92,12 @@ def load_all_profiles_by_name():
                 profiles.append(profile["id"])
     return profiles
 
-def create_new_profile(name, version, args):
+def create_new_profile(name, version, ram):
     os.mkdir(f"./profiles/{name}")
     profile = {
         "id": name,
         "version": version,
-        "args": args
+        "args": [f"-Xmx{ram}G"]
     }
     with open(f"./profiles/{name}/profile.info", "wb") as f:
         pickle.dump(profile, f)
@@ -114,6 +114,7 @@ def launch_profile(id):
                 "token": login_data["access_token"],
                 "jvmArguments": profile["args"]
             }
+            print(profile["args"])
             minecraft_launch_command = minecraft_launcher_lib.command.get_minecraft_command(
                 profile["version"], 
                 minecraft_directory, 

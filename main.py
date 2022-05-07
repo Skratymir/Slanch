@@ -61,6 +61,8 @@ class LaunchPage(tkinter.Frame):
         
         options = launcher.load_all_profiles_by_name()
         self.variable = tkinter.StringVar(self)
+        if len(options) == 0:
+            options = ["None"]
         self.variable.set(options[0])
         self.profile_selection = tkinter.OptionMenu(self, self.variable, *options)
         
@@ -155,41 +157,37 @@ class ProfileCreationPage(tkinter.Frame):
         all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
         self.selected_version.set(all_installed_versions[0])
-        default_java_args = "-Xmx2G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M"
         
         self.title_label = tkinter.Label(self, text="Create Profile")
         self.profile_name_label = tkinter.Label(self, text="Profile name")
         self.profile_version_label = tkinter.Label(self, text="Version")
-        self.profile_args_label = tkinter.Label(self, text="Java arguments")
+        self.profile_ram_label = tkinter.Label(self, text="Allocated RAM")
         self.profile_name_input = tkinter.Entry(self)
         self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
-        self.profile_args_input = tkinter.Entry(self)
-        self.profile_args_input.insert(-1, default_java_args)
+        self.profile_ram_input = tkinter.Scale(self, from_=1, to=8, orient="horizontal")
         self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
         
-        self.title_label.place(relx=0.5, rely=0, relwidth=1, relheight=0.2, anchor="n")
+        self.title_label.place(relx=0.5, rely=0.03, relwidth=1, relheight=0.2, anchor="n")
         self.profile_name_label.place(relx=0.1, rely=0.25, relwidth=0.3, relheight=0.2, anchor="nw")
         self.profile_name_input.place(relx=0.5, rely=0.3, relwidth=0.4, relheight=0.1, anchor="nw")
         self.profile_version_label.place(relx=0.1, rely=0.45, relwidth=0.3, relheight=0.2, anchor="nw")
         self.profile_version_dropdown.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.1, anchor="nw")
-        self.profile_args_label.place(relx=0.1, rely=0.65, relwidth=0.3, relheight=0.2, anchor="nw")
-        self.profile_args_input.place(relx=0.5, rely=0.7, relwidth=0.4, relheight=0.1, anchor="nw")
+        self.profile_ram_label.place(relx=0.1, rely=0.65, relwidth=0.3, relheight=0.2, anchor="nw")
+        self.profile_ram_input.place(relx=0.5, rely=0.675, relwidth=0.4, relheight=0.15, anchor="nw")
         self.profile_creation_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.1, anchor="n")
         
     def resize_font(self, event):
         self.title_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 3))
         self.profile_name_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_version_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
-        self.profile_args_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
+        self.profile_ram_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         
     def launcher_create_profile(self):
         name = self.profile_name_input.get()
         version = self.selected_version.get()
-        args = []
-        for argument in self.profile_args_input.get().split(" "):
-            args.append(argument)
+        ram = self.profile_ram_input.get()
             
-        launcher.create_new_profile(name, version, args)
+        launcher.create_new_profile(name, version, ram)
         self.controller.set_page("LaunchPage")
             
 def update_login_button():
