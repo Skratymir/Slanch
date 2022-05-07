@@ -6,6 +6,7 @@ import subprocess
 import random
 import string
 import pyAesCrypt
+import shutil
 
 CLIENT_ID = "9ff1e48d-5b3c-42bb-883f-fd0426a583c4"
 SECRET = "7Hw8Q~1pfZRlrL2Pfo9QEF~cZahZw5pxhRDv0b0G"
@@ -100,6 +101,9 @@ def create_new_profile(name, version, args):
     }
     with open(f"./profiles/{name}/profile.info", "wb") as f:
         pickle.dump(profile, f)
+        
+def delete_profile(id):
+    shutil.rmtree(f"profiles/{id}")
         
 def launch_profile(id):
     for profile in load_all_profiles():

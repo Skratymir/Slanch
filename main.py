@@ -1,6 +1,7 @@
 import launcher
 import tkinter
 from tkinter import font as tkFont
+import functools
 
 class Window(tkinter.Tk):
     def __init__(self):
@@ -94,12 +95,15 @@ class ProfilesPage(tkinter.Frame):
         
         self.profiles = launcher.load_all_profiles()
         
+        self.profile_frames = []
+        
         for profile in self.profiles:
             frame = tkinter.Frame(self.profiles_frame)
             tkinter.Label(frame, text=profile["id"], anchor="w").pack(side="left")
-            tkinter.Button(frame, text="delete", anchor="w").pack(side="right")
+            tkinter.Button(frame, text="delete", anchor="w", command=functools.partial(self.delete_profile, profile["id"])).pack(side="right")
             tkinter.Button(frame, text="edit", anchor="e").pack(side="right")
             frame.pack(side="bottom", anchor="w", fill="both", expand=True)
+            self.profile_frames.append(frame)
         frame = tkinter.Frame(self.profiles_frame)
         tkinter.Button(frame, text="Create new Profile", command=lambda: controller.set_page("ProfileCreationPage")).pack()
         frame.pack(side="bottom", anchor="w", fill="both", expand=True)
@@ -108,7 +112,13 @@ class ProfilesPage(tkinter.Frame):
         self.profiles_scrollbar.place(relx=1, rely=0.2, relheight=0.8, relwidth=0.035, anchor="ne")
         
     def create_frame(self):
-        self.profiles_canvas.create_window((0, 0), window=self.profiles_frame, anchor="nw", width=self.profiles_canvas.winfo_width())     
+        self.profiles_canvas.create_window((0, 0), window=self.profiles_frame, anchor="nw", width=self.profiles_canvas.winfo_width())
+        
+    def delete_profile(self, id):
+        for profile_frame in self.profile_frames:
+            if profile_frame.winfo_children()[0]["text"] == id:
+                profile_frame.pack_forget()
+                launcher.delete_profile(id)
         
 class SettingsPage(tkinter.Frame):
     def __init__(self, parent, controller):
