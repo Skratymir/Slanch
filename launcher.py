@@ -22,7 +22,7 @@ def login():
         
     auth_code = minecraft_launcher_lib.microsoft_account.get_auth_code_from_url(code_url)
     login_data = minecraft_launcher_lib.microsoft_account.complete_login(CLIENT_ID, SECRET, REDIRECT_URL, auth_code)
-    with open("login.pkl", "wb") as f:
+    with open("login.data", "wb") as f:
         pickle.dump(login_data, f)
     print("Login sucessful")
     logged_in = True
@@ -32,12 +32,12 @@ def logout():
     print("Logging out...")
     logged_in = False
     login_data = None
-    os.remove("login.pkl")
+    os.remove("login.data")
 
 def refresh_login():
     global logged_in, login_data
     try:
-        with open("login.pkl", "rb") as f:
+        with open("login.data", "rb") as f:
             login_data = pickle.load(f)
         minecraft_launcher_lib.microsoft_account.complete_refresh(CLIENT_ID, SECRET, REDIRECT_URL, login_data["refresh_token"])
         print("Logged in as {}".format(login_data["name"]))
@@ -70,7 +70,7 @@ def load_all_profiles():
     profiles = []
     for object in os.scandir("./profiles"):
         if object.is_dir():
-            with open(f"./profiles/{object.name}/profile.pkl", "rb") as f:
+            with open(f"./profiles/{object.name}/profile.info", "rb") as f:
                 profile = pickle.load(f)
                 profiles.append(profile)
     return profiles
@@ -79,7 +79,7 @@ def load_all_profiles_by_name():
     profiles = []
     for object in os.scandir("./profiles"):
         if object.is_dir():
-            with open(f"./profiles/{object.name}/profile.pkl", "rb") as f:
+            with open(f"./profiles/{object.name}/profile.info", "rb") as f:
                 profile = pickle.load(f)
                 profiles.append(profile["id"])
     return profiles
@@ -91,7 +91,7 @@ def create_new_profile(name, version, args):
         "version": version,
         "args": args
     }
-    with open(f"./profiles/{name}/profile.pkl", "wb") as f:
+    with open(f"./profiles/{name}/profile.info", "wb") as f:
         pickle.dump(profile, f)
         
 def launch_profile(id):
