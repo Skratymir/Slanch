@@ -1,5 +1,6 @@
 # Login information
 login.*
+*.key
 
 # profiles
 profiles/*
