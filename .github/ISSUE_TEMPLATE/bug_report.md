@@ -26,8 +26,8 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 11]
  - Version [e.g. v1.0.2]
-- Release or Sourcecode [e.g. Sourcecode]
-- If using Sourcecode python version [e.g. 3.8.10]
+ - Release or Sourcecode [e.g. Sourcecode]
+ - If using Sourcecode python version [e.g. 3.8.10]
 
 **Additional context**
 Add any other context about the problem here.
