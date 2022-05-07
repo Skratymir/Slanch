@@ -28,16 +28,19 @@ class Window(tkinter.Tk):
         self.frames["ProfilesPage"] = ProfilesPage(parent=container, controller=self)
         self.frames["SettingsPage"] = SettingsPage(parent=container, controller=self)
         self.frames["ProfileCreationPage"] = ProfileCreationPage(parent=container, controller=self)
+        self.frames["ProfileEditingPage"] = ProfileEditingPage(parent=container, controller=self)
         
         self.frames["LaunchPage"].grid(row=0, column=0, sticky="nsew")
         self.frames["ProfilesPage"].grid(row=0, column=0, sticky="nsew")
         self.frames["SettingsPage"].grid(row=0, column=0, sticky="nsew")
         self.frames["ProfileCreationPage"].grid(row=0, column=0, sticky="nsew")
+        self.frames["ProfileEditingPage"].grid(row=0, column=0, sticky="nsew")
         
         self.set_page("LaunchPage")
         self.update()
         self.frames["ProfilesPage"].create_frame()
         self.frames["ProfileCreationPage"].resize_font(0)
+        self.frames["ProfileEditingPage"].resize_font(0)
         
         
     def set_page(self, page_name):
@@ -188,6 +191,7 @@ class ProfileCreationPage(tkinter.Frame):
         self.profile_name_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_version_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_ram_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
+        self.profile_name_input["font"] = tkFont.Font(size=round(self.profile_name_input.winfo_height() - self.profile_name_input.winfo_height() / 2))
         
     def launcher_create_profile(self):
         name = self.profile_name_input.get()
@@ -201,6 +205,42 @@ class ProfileCreationPage(tkinter.Frame):
         self.controller.frames["LaunchPage"].profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
         
         self.controller.set_page("LaunchPage")
+        
+class ProfileEditingPage(tkinter.Frame):
+    def __init__(self, parent, controller):
+        tkinter.Frame.__init__(self, parent)
+        self.controller = controller
+        
+        self.font = ("Times new Roman", 12)
+        
+        all_installed_versions = launcher.load_all_installed_versions()
+        self.selected_version = tkinter.StringVar(self)
+        self.selected_version.set(all_installed_versions[0])
+        
+        self.title_label = tkinter.Label(self, text="Create Profile")
+        self.profile_name_label = tkinter.Label(self, text="Profile name")
+        self.profile_version_label = tkinter.Label(self, text="Version")
+        self.profile_ram_label = tkinter.Label(self, text="Allocated RAM")
+        self.profile_name_input = tkinter.Entry(self)
+        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
+        self.profile_ram_input = tkinter.Scale(self, from_=1, to=8, orient="horizontal")
+        self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
+        
+        self.title_label.place(relx=0.5, rely=0.03, relwidth=1, relheight=0.2, anchor="n")
+        self.profile_name_label.place(relx=0.1, rely=0.25, relwidth=0.3, relheight=0.2, anchor="nw")
+        self.profile_name_input.place(relx=0.5, rely=0.3, relwidth=0.4, relheight=0.1, anchor="nw")
+        self.profile_version_label.place(relx=0.1, rely=0.45, relwidth=0.3, relheight=0.2, anchor="nw")
+        self.profile_version_dropdown.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.1, anchor="nw")
+        self.profile_ram_label.place(relx=0.1, rely=0.65, relwidth=0.3, relheight=0.2, anchor="nw")
+        self.profile_ram_input.place(relx=0.5, rely=0.675, relwidth=0.4, relheight=0.15, anchor="nw")
+        self.profile_creation_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.1, anchor="n")
+        
+    def resize_font(self, event):
+        self.title_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 3))
+        self.profile_name_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
+        self.profile_version_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
+        self.profile_ram_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
+        self.profile_name_input["font"] = tkFont.Font(size=round(self.profile_name_input.winfo_height() - self.profile_name_input.winfo_height() / 2))
             
 def update_login_button():
     if launcher.check_login() == True:

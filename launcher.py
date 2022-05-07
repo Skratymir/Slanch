@@ -102,6 +102,17 @@ def create_new_profile(name, version, ram):
     with open(f"./profiles/{name}/profile.info", "wb") as f:
         pickle.dump(profile, f)
         
+def edit_profile(old_name, name, version, ram):
+    os.rename(f"./profiles/{old_name}", f"./profiles/{name}")
+    new_profile = {
+        "id": name,
+        "version": version,
+        "args": [f"-Xmx{ram}G"]
+    }
+    with open(f"./profiles/{name}/profile.info", "wb") as f:
+        pickle.dump(new_profile, f)
+    
+        
 def delete_profile(id):
     shutil.rmtree(f"profiles/{id}")
         
