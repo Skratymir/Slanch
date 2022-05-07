@@ -59,12 +59,12 @@ class LaunchPage(tkinter.Frame):
         
         self.launch_button = tkinter.Button(self, text="Launch", command=lambda: launcher.launch_profile(self.variable.get()))
         
-        options = launcher.load_all_profiles_by_name()
+        self.options = launcher.load_all_profiles_by_name()
         self.variable = tkinter.StringVar(self)
-        if len(options) == 0:
-            options = ["None"]
-        self.variable.set(options[0])
-        self.profile_selection = tkinter.OptionMenu(self, self.variable, *options)
+        if len(self.options) == 0:
+            self.options = ["None"]
+        self.variable.set(self.options[0])
+        self.profile_selection = tkinter.OptionMenu(self, self.variable, *self.options)
         
         self.launch_button.place(relx=0.5, rely=0.5, relwidth=0.3, relheight=0.3, anchor="center")
         self.profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
@@ -121,6 +121,14 @@ class ProfilesPage(tkinter.Frame):
             if profile_frame.winfo_children()[0]["text"] == id:
                 profile_frame.pack_forget()
                 launcher.delete_profile(id)
+                option_id = self.controller.frames["LaunchPage"].options.index(id)
+                self.controller.frames["LaunchPage"].profile_selection["menu"].delete(option_id, option_id)
+                self.controller.frames["LaunchPage"].options.remove(id)
+                if len(self.controller.frames["LaunchPage"].options) == 0:
+                    self.controller.frames["LaunchPage"].variable.set("None")
+                else:
+                    self.controller.frames["LaunchPage"].variable.set(self.controller.frames["LaunchPage"].options[0])
+                print(self.controller.frames["LaunchPage"].options)
         
 class SettingsPage(tkinter.Frame):
     def __init__(self, parent, controller):
@@ -188,6 +196,11 @@ class ProfileCreationPage(tkinter.Frame):
         ram = self.profile_ram_input.get()
             
         launcher.create_new_profile(name, version, ram)
+        self.controller.frames["LaunchPage"].options.append(name)
+        self.controller.frames["LaunchPage"].profile_selection.place_forget()
+        self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options)
+        self.controller.frames["LaunchPage"].profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
+        
         self.controller.set_page("LaunchPage")
             
 def update_login_button():
