@@ -98,27 +98,34 @@ class ProfilesPage(tkinter.Frame):
         )
         
         self.profiles_canvas.configure(yscrollcommand=(self.profiles_scrollbar.set))
-        
-        self.profiles = launcher.load_all_profiles()
-        
+
         self.profile_frames = []
         
-        for profile in self.profiles:
-            frame = tkinter.Frame(self.profiles_frame)
-            tkinter.Label(frame, text=profile["id"], anchor="w").pack(side="left")
-            tkinter.Button(frame, text="delete", anchor="w", command=partial(self.delete_profile, profile["id"])).pack(side="right")
-            tkinter.Button(frame, text="edit", anchor="e", command=partial(self.edit_profile, profile["id"])).pack(side="right")
-            frame.pack(side="bottom", anchor="w", fill="both", expand=True)
-            self.profile_frames.append(frame)
-        frame = tkinter.Frame(self.profiles_frame)
-        tkinter.Button(frame, text="Create new Profile", command=lambda: controller.set_page("ProfileCreationPage")).pack()
-        frame.pack(side="bottom", anchor="w", fill="both", expand=True)
+        self.add_profiles_to_canvas()
         
         self.profiles_canvas.place(relx=0.05, rely=0.2, relwidth=0.915, relheight=0.8, anchor="nw")
         self.profiles_scrollbar.place(relx=1, rely=0.2, relheight=0.8, relwidth=0.035, anchor="ne")
         
     def create_frame(self):
         self.profiles_canvas.create_window((0, 0), window=self.profiles_frame, anchor="nw", width=self.profiles_canvas.winfo_width())
+
+    def add_profiles_to_canvas(self):
+        for profile_frame in self.profile_frames:
+            profile_frame.pack_forget()
+        if hasattr(self, "frame"):
+            self.frame.pack_forget()
+        self.profiles = launcher.load_all_profiles()
+
+        for profile in self.profiles:
+            self.frame = tkinter.Frame(self.profiles_frame)
+            tkinter.Label(self.frame, text=profile["id"], anchor="w").pack(side="left")
+            tkinter.Button(self.frame, text="delete", anchor="w", command=partial(self.delete_profile, profile["id"])).pack(side="right")
+            tkinter.Button(self.frame, text="edit", anchor="e", command=partial(self.edit_profile, profile["id"])).pack(side="right")
+            self.frame.pack(side="bottom", anchor="w", fill="both", expand=True)
+            self.profile_frames.append(self.frame)
+        self.frame = tkinter.Frame(self.profiles_frame)
+        tkinter.Button(self.frame, text="Create new Profile", command=lambda: self.controller.set_page("ProfileCreationPage")).pack()
+        self.frame.pack(side="bottom", anchor="w", fill="both", expand=True)
         
     def delete_profile(self, id):
         for profile_frame in self.profile_frames:
@@ -211,6 +218,8 @@ class ProfileCreationPage(tkinter.Frame):
         ram = self.profile_ram_input.get()
             
         launcher.create_new_profile(name, version, ram)
+        
+        self.controller.frames["ProfilesPage"].add_profiles_to_canvas()
 
         self.controller.frames["LaunchPage"].options.append(name)
         self.controller.frames["LaunchPage"].profile_selection.place_forget()
