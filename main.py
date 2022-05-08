@@ -1,7 +1,8 @@
 import launcher
 import tkinter
+
 from tkinter import font as tkFont
-import functools
+from functools import partial
 
 class Window(tkinter.Tk):
     def __init__(self):
@@ -105,7 +106,7 @@ class ProfilesPage(tkinter.Frame):
         for profile in self.profiles:
             frame = tkinter.Frame(self.profiles_frame)
             tkinter.Label(frame, text=profile["id"], anchor="w").pack(side="left")
-            tkinter.Button(frame, text="delete", anchor="w", command=functools.partial(self.delete_profile, profile["id"])).pack(side="right")
+            tkinter.Button(frame, text="delete", anchor="w", command=partial(self.delete_profile, profile["id"])).pack(side="right")
             tkinter.Button(frame, text="edit", anchor="e").pack(side="right")
             frame.pack(side="bottom", anchor="w", fill="both", expand=True)
             self.profile_frames.append(frame)
@@ -178,13 +179,15 @@ class ProfileCreationPage(tkinter.Frame):
         self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
         
         self.title_label.place(relx=0.5, rely=0.03, relwidth=1, relheight=0.2, anchor="n")
-        self.profile_name_label.place(relx=0.1, rely=0.25, relwidth=0.3, relheight=0.2, anchor="nw")
+        self.profile_name_label.place(relx=0.05, rely=0.25, relwidth=0.4, relheight=0.2, anchor="nw")
         self.profile_name_input.place(relx=0.5, rely=0.3, relwidth=0.4, relheight=0.1, anchor="nw")
         self.profile_version_label.place(relx=0.1, rely=0.45, relwidth=0.3, relheight=0.2, anchor="nw")
         self.profile_version_dropdown.place(relx=0.5, rely=0.5, relwidth=0.4, relheight=0.1, anchor="nw")
-        self.profile_ram_label.place(relx=0.1, rely=0.65, relwidth=0.3, relheight=0.2, anchor="nw")
-        self.profile_ram_input.place(relx=0.5, rely=0.675, relwidth=0.4, relheight=0.15, anchor="nw")
+        self.profile_ram_label.place(relx=0.05, rely=0.65, relwidth=0.4, relheight=0.2, anchor="nw")
+        self.profile_ram_input.place(relx=0.5, rely=0.65, relwidth=0.4, relheight=0.15, anchor="nw")
         self.profile_creation_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.1, anchor="n")
+        
+        self.bind("<Configure>", self.resize_font)
         
     def resize_font(self, event):
         self.title_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 3))
@@ -192,6 +195,7 @@ class ProfileCreationPage(tkinter.Frame):
         self.profile_version_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_ram_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_name_input["font"] = tkFont.Font(size=round(self.profile_name_input.winfo_height() - self.profile_name_input.winfo_height() / 2))
+        self.profile_ram_input["width"] = (self.profile_ram_input.winfo_height() - self.profile_ram_input.winfo_height() / 2)
         
     def launcher_create_profile(self):
         name = self.profile_name_input.get()
@@ -224,7 +228,7 @@ class ProfileEditingPage(tkinter.Frame):
         self.profile_name_input = tkinter.Entry(self)
         self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
         self.profile_ram_input = tkinter.Scale(self, from_=1, to=8, orient="horizontal")
-        self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
+        self.profile_creation_button = tkinter.Button(self, text="Edit", command=self.launcher_edit_profile)
         
         self.title_label.place(relx=0.5, rely=0.03, relwidth=1, relheight=0.2, anchor="n")
         self.profile_name_label.place(relx=0.1, rely=0.25, relwidth=0.3, relheight=0.2, anchor="nw")
@@ -234,6 +238,9 @@ class ProfileEditingPage(tkinter.Frame):
         self.profile_ram_label.place(relx=0.1, rely=0.65, relwidth=0.3, relheight=0.2, anchor="nw")
         self.profile_ram_input.place(relx=0.5, rely=0.675, relwidth=0.4, relheight=0.15, anchor="nw")
         self.profile_creation_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.1, anchor="n")
+        
+    def launcher_edit_profile(self):
+        pass
         
     def resize_font(self, event):
         self.title_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 3))
@@ -252,5 +259,5 @@ if __name__ == "__main__":
     window = Window()
     launcher.refresh_login()
     update_login_button()
-    window.resizable(False, False)
+    window.minsize(420, 270)
     window.mainloop()
