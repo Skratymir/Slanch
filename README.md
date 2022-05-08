@@ -2,7 +2,7 @@
 Slanch is a modern and simple Minecraft Launcher, aimed at improving the work with mods, resource packs and other shenanigans. You can create profiles, each with their own mods, resource packs and settings. This also includes Optifine settings!
 In short, Slanch is exactly what the word describes: A way of allowing you to relax by relieving you of tasks like changing modpacks, finding the right resource pack for each version, or things just as simple as allocating more RAM to Minecraft without loosing any features or comfortability.
 
-# Features
+## Features
 - Simple, windowed minecraft Launcher, split into 3 Pages.
 
 The Launch Page:
@@ -18,7 +18,7 @@ The Profiles Page:
 The Settings Page:
 - Log in or out of your Microsoft account
 
-# Still coming 
+## Still coming 
 (:hammer:=Work in progress, :x:=Not yet started)
 
 [🔨] Profile Editing
