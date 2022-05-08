@@ -12,7 +12,7 @@ The Profiles Page:
 - View all your current profiles
 - Create new profiles
 - Delete any profile
-- Edit any profile (Still in development)
+- Edit any profile
 - Open the profile folder to add mods, resource packs, or other files (Still in development)
 
 The Settings Page:
@@ -21,11 +21,9 @@ The Settings Page:
 ## Still coming 
 (:hammer:=Work in progress, :x:=Not yet started)
 
-[🔨] Profile Editing
-
 [:x:] Settings
 
-[:x:] Profile specific option files
+[:hammer:] Profile specific option files
 
 [:x:] Profile specific mods
 
