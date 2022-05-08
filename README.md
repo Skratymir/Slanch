@@ -3,7 +3,7 @@ Slanch is a modern and simple Minecraft Launcher, aimed at improving the work wi
 In short, Slanch is exactly what the word describes: A way of allowing you to relax by relieving you of tasks like changing modpacks, finding the right resource pack for each version, or things just as simple as allocating more RAM to Minecraft without loosing any features or comfortability.
 
 ## Features
-- Simple, windowed minecraft Launcher, split into 3 Pages.
+- Simple minecraft launcher, split into 3 Pages.
 
 The Launch Page:
 - Select a profile to start and launch it
