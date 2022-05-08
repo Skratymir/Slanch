@@ -19,7 +19,7 @@ The Settings Page:
 - Log in or out of your Microsoft account
 
 ## Still coming 
-(:hammer:=Work in progress, :x:=Not yet started)
+([:hammer:]=Work in progress, [:x:]=Not yet started)
 
 [:x:] Settings
 
@@ -28,3 +28,6 @@ The Settings Page:
 [:x:] Profile specific mods
 
 [:x:] GUI Textures, colours
+
+## How to build yourself
+[:hammer:] Coming soon! [:hammer:]
