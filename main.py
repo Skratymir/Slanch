@@ -257,6 +257,8 @@ class ProfileEditingPage(tkinter.Frame):
         self.profile_ram_input.place(relx=0.5, rely=0.675, relwidth=0.4, relheight=0.15, anchor="nw")
         self.profile_creation_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.1, anchor="n")
         
+        self.bind("<Configure>", self.resize_font)
+        
     def launcher_edit_profile(self):
         if self.profile_name_input.get() != "":
             name = self.profile_name_input.get()
@@ -288,6 +290,7 @@ class ProfileEditingPage(tkinter.Frame):
         self.profile_version_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_ram_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 1.35))
         self.profile_name_input["font"] = tkFont.Font(size=round(self.profile_name_input.winfo_height() - self.profile_name_input.winfo_height() / 2))
+        self.profile_ram_input["width"] = (self.profile_ram_input.winfo_height() - self.profile_ram_input.winfo_height() / 2)
             
 def update_login_button():
     if launcher.check_login() == True:
