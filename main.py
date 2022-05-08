@@ -107,7 +107,7 @@ class ProfilesPage(tkinter.Frame):
             frame = tkinter.Frame(self.profiles_frame)
             tkinter.Label(frame, text=profile["id"], anchor="w").pack(side="left")
             tkinter.Button(frame, text="delete", anchor="w", command=partial(self.delete_profile, profile["id"])).pack(side="right")
-            tkinter.Button(frame, text="edit", anchor="e").pack(side="right")
+            tkinter.Button(frame, text="edit", anchor="e", command=partial(self.edit_profile, profile["id"])).pack(side="right")
             frame.pack(side="bottom", anchor="w", fill="both", expand=True)
             self.profile_frames.append(frame)
         frame = tkinter.Frame(self.profiles_frame)
@@ -132,6 +132,16 @@ class ProfilesPage(tkinter.Frame):
                     self.controller.frames["LaunchPage"].variable.set("None")
                 else:
                     self.controller.frames["LaunchPage"].variable.set(self.controller.frames["LaunchPage"].options[0])
+                    
+    def edit_profile(self, old_name):
+        self.controller.frames["ProfileEditingPage"].profile_name_input.insert(0, old_name)
+        self.controller.frames["ProfileEditingPage"].old_name = old_name
+        for profile in launcher.load_all_profiles():
+            if profile["id"] == old_name:
+                self.controller.frames["ProfileEditingPage"].selected_version.set(profile["version"])
+                self.controller.frames["ProfileEditingPage"].profile_ram_input.set(profile["args"][0][4:5])
+        
+        self.controller.set_page("ProfileEditingPage")
         
 class SettingsPage(tkinter.Frame):
     def __init__(self, parent, controller):
@@ -162,8 +172,6 @@ class ProfileCreationPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
-        
-        self.font = ("Times new Roman", 12)
         
         all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
@@ -203,6 +211,7 @@ class ProfileCreationPage(tkinter.Frame):
         ram = self.profile_ram_input.get()
             
         launcher.create_new_profile(name, version, ram)
+
         self.controller.frames["LaunchPage"].options.append(name)
         self.controller.frames["LaunchPage"].profile_selection.place_forget()
         self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options)
@@ -214,19 +223,19 @@ class ProfileEditingPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
+
+        self.old_name = ""
         
-        self.font = ("Times new Roman", 12)
-        
-        all_installed_versions = launcher.load_all_installed_versions()
+        self.all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
-        self.selected_version.set(all_installed_versions[0])
+        self.selected_version.set(self.all_installed_versions[0])
         
-        self.title_label = tkinter.Label(self, text="Create Profile")
+        self.title_label = tkinter.Label(self, text="Edit Profile")
         self.profile_name_label = tkinter.Label(self, text="Profile name")
         self.profile_version_label = tkinter.Label(self, text="Version")
         self.profile_ram_label = tkinter.Label(self, text="Allocated RAM")
         self.profile_name_input = tkinter.Entry(self)
-        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
+        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *self.all_installed_versions)
         self.profile_ram_input = tkinter.Scale(self, from_=1, to=8, orient="horizontal")
         self.profile_creation_button = tkinter.Button(self, text="Edit", command=self.launcher_edit_profile)
         
@@ -240,7 +249,29 @@ class ProfileEditingPage(tkinter.Frame):
         self.profile_creation_button.place(relx=0.5, rely=0.85, relwidth=0.5, relheight=0.1, anchor="n")
         
     def launcher_edit_profile(self):
-        pass
+        if self.profile_name_input.get() != "":
+            name = self.profile_name_input.get()
+            version = self.selected_version.get()
+            ram = self.profile_ram_input.get()
+
+            launcher.edit_profile(self.old_name, name, version, ram)
+
+            self.controller.frames["LaunchPage"].options.append(name)
+            self.controller.frames["LaunchPage"].options.remove(self.old_name)
+            self.controller.frames["LaunchPage"].variable.set(name)
+            self.controller.frames["LaunchPage"].profile_selection.place_forget()
+            self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options)
+            self.controller.frames["LaunchPage"].profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
+
+        for profile_frame in self.controller.frames["ProfilesPage"].profile_frames:
+            if profile_frame.winfo_children()[0]["text"] == self.old_name:
+                profile_frame.winfo_children()[0]["text"] = name
+                profile_frame.winfo_children()[1].configure(command=partial(self.controller.frames["ProfilesPage"].delete_profile, name))
+                profile_frame.winfo_children()[2].configure(command=partial(self.controller.frames["ProfilesPage"].edit_profile, name))
+            
+            self.old_name = ""
+            self.profile_name_input.delete(0, "end")
+            self.controller.set_page("LaunchPage")
         
     def resize_font(self, event):
         self.title_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 3))
