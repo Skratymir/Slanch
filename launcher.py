@@ -7,20 +7,33 @@ import random
 import string
 import pyAesCrypt
 import shutil
+import http.server
+import webbrowser
+import socketserver
 
 from threading import Thread
 
 CLIENT_ID = "9ff1e48d-5b3c-42bb-883f-fd0426a583c4"
 SECRET = "7Hw8Q~1pfZRlrL2Pfo9QEF~cZahZw5pxhRDv0b0G"
-REDIRECT_URL = "http://localhost/"
+REDIRECT_URL = "http://localhost:8000/logged_in.html"
 minecraft_directory = minecraft_launcher_lib.utils.get_minecraft_directory()
 login_data = None
 logged_in = False
+global url
+
+class GetURLHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        global url
+        http.server.SimpleHTTPRequestHandler.do_GET(self)
+        url = self.path
     
 def login():
-    global logged_in, login_data
-    print(f"Open {minecraft_launcher_lib.microsoft_account.get_login_url(CLIENT_ID, REDIRECT_URL) } in your Browser, login and paste the url you are redirected to here: ")
-    code_url = input()
+    global logged_in, login_data, url
+    webbrowser.open(minecraft_launcher_lib.microsoft_account.get_login_url(CLIENT_ID, REDIRECT_URL))
+    Handler = GetURLHandler
+    httpd = socketserver.TCPServer(("", 8000), Handler)
+    httpd.handle_request()
+    code_url = url
     
     if not minecraft_launcher_lib.microsoft_account.url_contains_auth_code(code_url):
         print("Url invalid")
@@ -39,6 +52,7 @@ def logout():
     print("Logging out...")
     logged_in = False
     login_data = None
+    decrypt_login_data()
     os.remove("login.data")
 
 def refresh_login():
