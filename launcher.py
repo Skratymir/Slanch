@@ -8,6 +8,8 @@ import string
 import pyAesCrypt
 import shutil
 
+from threading import Thread
+
 CLIENT_ID = "9ff1e48d-5b3c-42bb-883f-fd0426a583c4"
 SECRET = "7Hw8Q~1pfZRlrL2Pfo9QEF~cZahZw5pxhRDv0b0G"
 REDIRECT_URL = "http://localhost/"
@@ -131,15 +133,19 @@ def launch_profile(id):
                 minecraft_directory, 
                 minecraft_launch_options
             )
-            print("Verifying installation of version {}".format(profile["version"]))
-            minecraft_launcher_lib.install.install_minecraft_version(profile["version"], minecraft_directory)
-            print("Refreshing login")
-            refresh_login()
-            if logged_in == True:
-                print("Refreshed Login. Starting Version {}".format(profile["version"]))
-                subprocess.call(minecraft_launch_command)
-            else:
-                print("Refresh unsucessful. Please login again from the settings page")
+            Thread(target=launch_minecraft, args=(profile, minecraft_directory, minecraft_launch_command)).start()
+
+def launch_minecraft(profile, minecraft_directory, minecraft_launch_command):
+    global logged_in
+    print("Verifying installation of version {}".format(profile["version"]))
+    minecraft_launcher_lib.install.install_minecraft_version(profile["version"], minecraft_directory)
+    print("Refreshing login")
+    refresh_login()
+    if logged_in == True:
+        print("Refreshed Login. Starting Version {}".format(profile["version"]))
+        subprocess.call(minecraft_launch_command)
+    else:
+        print("Refresh unsucessful. Please login again from the settings page")
     
 def encrypt_login_data():
     if not os.path.exists("key.key"):
