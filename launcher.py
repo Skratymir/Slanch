@@ -110,6 +110,7 @@ def load_all_profiles_by_name():
 
 def create_new_profile(name, version, ram):
     os.mkdir(f"./profiles/{name}")
+    os.mkdir(f"./profiles/{name}/backup/")
     profile = {
         "id": name,
         "version": version,
@@ -157,9 +158,29 @@ def launch_minecraft(profile, minecraft_directory, minecraft_launch_command):
     refresh_login()
     if logged_in == True:
         print("Refreshed Login. Starting Version {}".format(profile["version"]))
+        copy_minecraft_options_from_profile(profile["id"])
         subprocess.call(minecraft_launch_command)
+        restore_minecraft_options(profile["id"])
     else:
         print("Refresh unsucessful. Please login again from the settings page")
+
+def copy_minecraft_options_from_profile(profile_id):
+    print("Backing options files up")
+    options_files = []
+    for item in os.listdir(minecraft_directory):
+        if os.path.isfile(minecraft_directory + "\\" + item) and "options" in item:
+            options_files.append(item)
+
+    for item in os.listdir(f"./profiles/{profile_id}/"):
+        if item in options_files:
+            shutil.copyfile(minecraft_directory + "\\" + item, f"./profiles/{profile_id}/backup/{item}")
+            shutil.copyfile(f"./profiles/{profile_id}/{item}", minecraft_directory + "\\" + item)
+
+def restore_minecraft_options(profile_id):
+    print("Restoring options files")
+    for item in os.listdir(f"./profiles/{profile_id}/backup/"):
+        if os.path.isfile(f"./profiles/{profile_id}/backup/{item}"):
+            shutil.copyfile(f"./profiles/{profile_id}/backup/{item}", minecraft_directory + "\\" + item)
     
 def encrypt_login_data():
     if not os.path.exists("key.key"):
