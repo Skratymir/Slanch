@@ -7,6 +7,7 @@ In short, Slanch is exactly what the word describes: A way of allowing you to re
 
 The Launch Page:
 - Select a profile to start and launch it
+- Start profile using all files in profile folder (e.g. Options files)
 
 The Profiles Page:
 - View all your current profiles
@@ -23,11 +24,9 @@ The Settings Page:
 
 [:x:] Settings
 
-[:hammer:] Profile specific option files
-
-[:x:] Profile specific mods
+[:hammer:] Profile specific mods
 
 [:x:] GUI Textures, colours
 
 ## How to build yourself
-[:hammer:] Coming soon! [:hammer:]
+[:hammer:] Coming after v1.0.0 is done! [:hammer:]
