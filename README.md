@@ -28,5 +28,7 @@ The Settings Page:
 
 [:x:] GUI Textures, colours
 
+[:x:] Better login html
+
 ## How to build yourself
 [:hammer:] Coming after v1.0.0 is done! [:hammer:]
