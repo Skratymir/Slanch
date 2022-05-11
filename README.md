@@ -22,9 +22,9 @@ The Settings Page:
 ## Still coming 
 ([:hammer:]=Work in progress, [:x:]=Not yet started)
 
-[:x:] Settings
+[:hammer:] Install Minecraft, Forge and Fabric
 
-[:hammer:] Profile specific mods
+[:x:] Settings
 
 [:x:] GUI Textures, colours
 
