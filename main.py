@@ -2,7 +2,6 @@ import launcher
 import tkinter
 
 from tkinter import font as tkFont
-from tkinter import ttk
 from functools import partial
 
 class Window(tkinter.Tk):
