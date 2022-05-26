@@ -1,7 +1,9 @@
 import launcher
 import tkinter
+import tkinter.messagebox
 
 from tkinter import font as tkFont
+from tkinter import ttk
 from functools import partial
 
 class Window(tkinter.Tk):
@@ -169,7 +171,7 @@ class SettingsPage(tkinter.Frame):
         settings_page_button.place(relx=1, rely=0, relwidth=0.33, relheight=0.15, anchor="ne")
         
         self.login_button = tkinter.Button(self, text="Login", command=lambda: self.login_out())
-        self.install_minecraft_version_button = tkinter.Button(self, text="Install Minecraft Version")
+        self.install_minecraft_version_button = tkinter.Button(self, text="Install Minecraft Version", command=lambda: controller.set_page("InstallationPage"))
         
         self.login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
         self.install_minecraft_version_button.place(relx=0.5, rely= 0.4, relwidth=0.3, relheight=0.15, anchor="n")
@@ -303,20 +305,26 @@ class InstallationPage(tkinter.Frame):
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
 
-        self.all_available_versions = launcher.load_all_available_versions()
+        self.show_snapshots = tkinter.BooleanVar()
+
+        self.all_selected_versions = launcher.load_all_release_versions()
         self.selected_version = tkinter.StringVar(self)
-        if not self.all_available_versions == []:
-            self.selected_version.set(self.all_available_versions[0])
+        if not self.all_selected_versions == []:
+            self.selected_version.set(self.all_selected_versions[0])
         else:
             self.selected_version = "None"
 
         self.title_label = tkinter.Label(self, text="Pick Version to install")
-        self.version_selection = tkinter.Button(self, text="test", command=lambda: self.controller.frames["VersionSelectionPopup"].scrollmenu(self.all_available_versions))
+        self.version_selection = tkinter.Button(self, text="Version", command=lambda: self.controller.frames["VersionSelectionPopup"].scrollmenu(self.all_selected_versions))
+        self.show_snapshots_checkbox = tkinter.Checkbutton(self, text="Show Snapshots", variable=self.show_snapshots, command=self.reload_all_selected_versions)
         self.install_version_button = tkinter.Button(self, text="Install Version", command=self.install_minecraft_version)
+        self.install_progressbar = ttk.Progressbar(self, orient="horizontal", mode="determinate", length=200)
 
         self.title_label.place(relx=0.5, rely=0.03, relwidth=1, relheight=0.2, anchor="n")
         self.version_selection.place(relx=0.5, rely=0.3, relwidth=0.75, relheight=0.3, anchor="n")
+        self.show_snapshots_checkbox.place(relx=0.5, rely=0.65, anchor="center")
         self.install_version_button.place(relx=0.5, rely=0.9, relwidth=0.3, relheight=0.15, anchor="s")
+        self.install_progressbar.place(relx=0.5, rely=0.92, relheight=0.05, anchor="n")
 
     def resize_font(self, event):
         self.title_label["font"] = tkFont.Font(size=round(self.title_label.winfo_height() - self.title_label.winfo_height() / 3))
@@ -325,8 +333,31 @@ class InstallationPage(tkinter.Frame):
 
     def install_minecraft_version(self):
         version = self.version_selection["text"]
+        if version == "Version":
+            tkinter.messagebox.showerror("Version Error", "No version was selected")
+            return
         print(f"Installing miencraft version {version}")
-        launcher.install_minecraft_version(version=version)
+
+        callback = {
+            "setStatus": lambda text: print(text),
+            "setProgress": lambda value: self.set_progressbar_value(value),
+            "setMax": lambda value: self.set_maximum_progressvalue(value)
+        }
+
+        launcher.minecraft_launcher_lib.install.install_minecraft_version(version, launcher.minecraft_directory, callback=callback)
+
+    def set_maximum_progressvalue(self, value):
+        self.install_progressbar["maximum"] = value
+
+    def set_progressbar_value(self, value):
+        self.install_progressbar["value"] = value
+        self.controller.update()
+
+    def reload_all_selected_versions(self):
+        if self.show_snapshots.get() == True:
+            self.all_selected_versions = launcher.load_all_available_versions()
+        else:
+            self.all_selected_versions = launcher.load_all_release_versions()
 
 class VersionSelectionPopup:
     def __init__(self, parent):
@@ -340,19 +371,21 @@ class VersionSelectionPopup:
 
         self.scrollmenu_window.bind("<FocusOut>", self.quit)
 
-        scroll_canvas = tkinter.Canvas(self.scrollmenu_window)
-        options_frame = tkinter.Frame(scroll_canvas)
+        self.scroll_canvas = tkinter.Canvas(self.scrollmenu_window)
+        options_frame = tkinter.Frame(self.scroll_canvas)
 
+        self.scroll_canvas.bind("<Enter>", self.bind_mousewheel)
+        self.scroll_canvas.bind("<Leave>", self.unbind_mousewheel)
         options_frame.bind(
             "<Configure>",
-            lambda e: scroll_canvas.configure(
-                scrollregion=scroll_canvas.bbox("all")
+            lambda e: self.scroll_canvas.configure(
+                scrollregion=self.scroll_canvas.bbox("all")
             )
         )
 
-        scroll_canvas.place(relx=0, rely=0, relheight=1, relwidth=0.9, anchor="nw")
+        self.scroll_canvas.place(relx=0, rely=0, relheight=1, relwidth=0.9, anchor="nw")
 
-        scroll_canvas.create_window((0, 0), anchor="nw", window=options_frame)
+        self.scroll_canvas.create_window((0, 0), anchor="nw", window=options_frame)
 
         for i in range(len(list)):
             button = tkinter.Button(options_frame, text=str(list[i]), border=0, anchor="w", 
@@ -366,9 +399,9 @@ class VersionSelectionPopup:
         
         self.scrollmenu_window.geometry(f"{round(max_width + max_width / 8)}x{round(self.parent.winfo_y())}")
 
-        scrollbar = tkinter.Scrollbar(self.scrollmenu_window, command=scroll_canvas.yview)
+        scrollbar = tkinter.Scrollbar(self.scrollmenu_window, command=self.scroll_canvas.yview)
         scrollbar.place(relx=0.9, rely=0, relheight=1, relwidth=0.1, anchor="nw")
-        scroll_canvas.config(yscrollcommand=scrollbar.set)
+        self.scroll_canvas.config(yscrollcommand=scrollbar.set)
 
     def set_button_text(self, text):
         self.parent.frames["InstallationPage"].version_selection["text"] = str(text)
@@ -376,6 +409,15 @@ class VersionSelectionPopup:
 
     def quit(self, event=None):
         self.scrollmenu_window.destroy()
+
+    def bind_mousewheel(self, event=None):
+        self.scroll_canvas.bind_all("<MouseWheel>", self.mousewheel_move)
+
+    def unbind_mousewheel(self, event=None):
+        self.scroll_canvas.unbind_all("<MouseWheel>")
+    
+    def mousewheel_move(self, event):
+        self.scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
             
 def update_login_button():
     if launcher.check_login() == True:

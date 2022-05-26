@@ -96,8 +96,12 @@ def load_all_available_versions():
         versions.append(version["id"])
     return versions
 
-def install_minecraft_version(version):
-    minecraft_launcher_lib.install.install_minecraft_version(version, minecraft_directory)
+def load_all_release_versions():
+    versions = []
+    for version in minecraft_launcher_lib.utils.get_available_versions(minecraft_directory):
+        if version["type"] == "release":
+            versions.append(version["id"])
+    return versions
 
 def load_all_profiles():
     profiles = []
