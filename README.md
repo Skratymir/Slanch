@@ -18,17 +18,18 @@ The Profiles Page:
 
 The Settings Page:
 - Log in or out of your Microsoft account
+- Install any official Minecraft version (This includes snapshots, alpha, etc.)
 
 ## Still coming 
 ([:hammer:]=Work in progress, [:x:]=Not yet started)
 
-[:hammer:] Install Minecraft, Forge and Fabric
+[:x:] Install Forge and Fabric
 
 [:x:] Settings
 
 [:x:] GUI Textures, colours
 
-[:x:] Better login html
+[:hammer:] Better login confirmation website
 
 ## How to build yourself
 [:hammer:] Coming after v1.0.0 is done! [:hammer:]
