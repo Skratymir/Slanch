@@ -90,6 +90,19 @@ def load_all_installed_versions():
         versions.append(version["id"])
     return versions
 
+def load_all_available_versions():
+    versions = []
+    for version in minecraft_launcher_lib.utils.get_available_versions(minecraft_directory):
+        versions.append(version["id"])
+    return versions
+
+def load_all_release_versions():
+    versions = []
+    for version in minecraft_launcher_lib.utils.get_available_versions(minecraft_directory):
+        if version["type"] == "release":
+            versions.append(version["id"])
+    return versions
+
 def load_all_profiles():
     profiles = []
     for object in os.scandir("./profiles"):
@@ -212,3 +225,9 @@ def decrypt_login_data():
         os.remove("login.encrypted")
     except FileNotFoundError:
         print("Key file not found. Please log in again from the Settings Page")
+
+def is_vanilla_version(version, all_versions):
+    if version in all_versions:
+        return True
+    else:
+        return False
