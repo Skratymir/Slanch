@@ -224,6 +224,10 @@ class ProfileCreationPage(tkinter.Frame):
         name = self.profile_name_input.get()
         version = self.selected_version.get()
         ram = self.profile_ram_input.get()
+
+        if name == "":
+            tkinter.messagebox.showerror("Input error", "Please enter a profile name")
+            return
             
         launcher.create_new_profile(name, version, ram)
         
