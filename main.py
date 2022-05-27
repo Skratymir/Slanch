@@ -134,17 +134,18 @@ class ProfilesPage(tkinter.Frame):
         self.frame.pack(side="bottom", anchor="w", fill="both", expand=True)
         
     def delete_profile(self, id):
-        for profile_frame in self.profile_frames:
-            if profile_frame.winfo_children()[0]["text"] == id:
-                profile_frame.pack_forget()
-                launcher.delete_profile(id)
-                option_id = self.controller.frames["LaunchPage"].options.index(id)
-                self.controller.frames["LaunchPage"].profile_selection["menu"].delete(option_id, option_id)
-                self.controller.frames["LaunchPage"].options.remove(id)
-                if len(self.controller.frames["LaunchPage"].options) == 0:
-                    self.controller.frames["LaunchPage"].variable.set("None")
-                else:
-                    self.controller.frames["LaunchPage"].variable.set(self.controller.frames["LaunchPage"].options[0])
+        if tkinter.messagebox.askyesno("Deletion confirmation", "Are you sure you want to delete this profile?"):
+            for profile_frame in self.profile_frames:
+                if profile_frame.winfo_children()[0]["text"] == id:
+                    profile_frame.pack_forget()
+                    launcher.delete_profile(id)
+                    option_id = self.controller.frames["LaunchPage"].options.index(id)
+                    self.controller.frames["LaunchPage"].profile_selection["menu"].delete(option_id, option_id)
+                    self.controller.frames["LaunchPage"].options.remove(id)
+                    if len(self.controller.frames["LaunchPage"].options) == 0:
+                        self.controller.frames["LaunchPage"].variable.set("None")
+                    else:
+                        self.controller.frames["LaunchPage"].variable.set(self.controller.frames["LaunchPage"].options[0])
                     
     def edit_profile(self, old_name):
         self.controller.frames["ProfileEditingPage"].profile_name_input.insert(0, old_name)
