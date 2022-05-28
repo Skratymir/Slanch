@@ -7,7 +7,7 @@ profiles/*
 
 # other stuff
 logs/
-test*.py
+test*.*
 .vscode
 
 # Byte-compiled / optimized / DLL files
