@@ -184,7 +184,7 @@ class SettingsPage(tkinter.Frame):
         if launcher.check_login():
             launcher.logout()
         else:
-            launcher.login()
+            launcher.login(CLIENT_ID, REDIRECT_URL, SECRET)
         update_login_button()
 
 
@@ -446,8 +446,12 @@ def update_login_button():
 
 
 if __name__ == "__main__":
+    CLIENT_ID = "Your Client ID"
+    SECRET = "Your Client Secret"
+    REDIRECT_URL = "http://localhost:8000/logged_in.html"
+
     window = Window()
-    launcher.refresh_login()
+    launcher.refresh_login(CLIENT_ID, REDIRECT_URL, SECRET)
     update_login_button()
     window.minsize(420, 270)
     window.mainloop()
