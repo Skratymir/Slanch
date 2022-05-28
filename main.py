@@ -6,19 +6,20 @@ from tkinter import font as tkFont
 from tkinter import ttk
 from functools import partial
 
+
 class Window(tkinter.Tk):
     def __init__(self):
         tkinter.Tk.__init__(self)
         self.title("Slanch")
         self.geometry(
-            str(round(self.winfo_screenwidth() / 3)) + 
-            "x" + 
-            str(round(self.winfo_screenheight() / 3)) + 
+            str(round(self.winfo_screenwidth() / 3)) +
+            "x" +
+            str(round(self.winfo_screenheight() / 3)) +
             "+" +
-            str(round(self.winfo_screenwidth() / 2 - self.winfo_screenwidth() / 6)) + 
+            str(round(self.winfo_screenwidth() / 2 - self.winfo_screenwidth() / 6)) +
             "+" +
             str(round(self.winfo_screenheight() / 2 - self.winfo_screenheight() / 6))
-            )
+        )
         
         container = tkinter.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -49,11 +50,11 @@ class Window(tkinter.Tk):
         self.frames["ProfileEditingPage"].resize_font(0)
         self.frames["InstallationPage"].resize_font(0)
         
-        
     def set_page(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
-        
+
+
 class LaunchPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
@@ -78,7 +79,8 @@ class LaunchPage(tkinter.Frame):
         
         self.launch_button.place(relx=0.5, rely=0.5, relwidth=0.3, relheight=0.3, anchor="center")
         self.profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
-        
+
+
 class ProfilesPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
@@ -156,7 +158,8 @@ class ProfilesPage(tkinter.Frame):
                 self.controller.frames["ProfileEditingPage"].profile_ram_input.set(profile["args"][0][4:5])
         
         self.controller.set_page("ProfileEditingPage")
-        
+
+
 class SettingsPage(tkinter.Frame):
     def __init__(self, parent, controller):
         global login_button
@@ -175,15 +178,16 @@ class SettingsPage(tkinter.Frame):
         self.install_minecraft_version_button = tkinter.Button(self, text="Install Minecraft Version", command=lambda: controller.set_page("InstallationPage"))
         
         self.login_button.place(relx=0.5, rely=0.2, relwidth=0.3, relheight=0.15, anchor="n")
-        self.install_minecraft_version_button.place(relx=0.5, rely= 0.4, relwidth=0.3, relheight=0.15, anchor="n")
+        self.install_minecraft_version_button.place(relx=0.5, rely=0.4, relwidth=0.3, relheight=0.15, anchor="n")
         
     def login_out(self):
         if launcher.check_login():
             launcher.logout()
         else:
-            launcher.login()
+            launcher.login(CLIENT_ID, REDIRECT_URL, SECRET)
         update_login_button()
-            
+
+
 class ProfileCreationPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
@@ -236,11 +240,14 @@ class ProfileCreationPage(tkinter.Frame):
 
         self.controller.frames["LaunchPage"].options.append(name)
         self.controller.frames["LaunchPage"].profile_selection.place_forget()
-        self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options)
+        self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(
+            self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options
+        )
         self.controller.frames["LaunchPage"].profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
         
         self.controller.set_page("LaunchPage")
-        
+
+
 class ProfileEditingPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
@@ -284,7 +291,9 @@ class ProfileEditingPage(tkinter.Frame):
             self.controller.frames["LaunchPage"].options.remove(self.old_name)
             self.controller.frames["LaunchPage"].variable.set(name)
             self.controller.frames["LaunchPage"].profile_selection.place_forget()
-            self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options)
+            self.controller.frames["LaunchPage"].profile_selection = tkinter.OptionMenu(
+                self.controller.frames["LaunchPage"], self.controller.frames["LaunchPage"].variable, *self.controller.frames["LaunchPage"].options
+            )
             self.controller.frames["LaunchPage"].profile_selection.place(relx=0.5, rely=0.7, relwidth=0.3, relheight=0.2, anchor="n")
 
         for profile_frame in self.controller.frames["ProfilesPage"].profile_frames:
@@ -305,6 +314,7 @@ class ProfileEditingPage(tkinter.Frame):
         self.profile_name_input["font"] = tkFont.Font(size=round(self.profile_name_input.winfo_height() - self.profile_name_input.winfo_height() / 2))
         self.profile_ram_input["width"] = (self.profile_ram_input.winfo_height() - self.profile_ram_input.winfo_height() / 2)
 
+
 class InstallationPage(tkinter.Frame):
     def __init__(self, parent, controller):
         tkinter.Frame.__init__(self, parent)
@@ -320,7 +330,9 @@ class InstallationPage(tkinter.Frame):
             self.selected_version = "None"
 
         self.title_label = tkinter.Label(self, text="Pick Version to install")
-        self.version_selection = tkinter.Button(self, text="Version", command=lambda: self.controller.frames["VersionSelectionPopup"].scrollmenu(self.all_selected_versions))
+        self.version_selection = tkinter.Button(
+            self, text="Version", command=lambda: self.controller.frames["VersionSelectionPopup"].scrollmenu(self.all_selected_versions)
+        )
         self.show_snapshots_checkbox = tkinter.Checkbutton(self, text="Show Snapshots", variable=self.show_snapshots, command=self.reload_all_selected_versions)
         self.install_version_button = tkinter.Button(self, text="Install Version", command=self.install_minecraft_version)
         self.install_progressbar = ttk.Progressbar(self, orient="horizontal", mode="determinate", length=200)
@@ -359,10 +371,11 @@ class InstallationPage(tkinter.Frame):
         self.controller.update()
 
     def reload_all_selected_versions(self):
-        if self.show_snapshots.get() == True:
+        if self.show_snapshots.get():
             self.all_selected_versions = launcher.load_all_available_versions()
         else:
             self.all_selected_versions = launcher.load_all_release_versions()
+
 
 class VersionSelectionPopup:
     def __init__(self, parent):
@@ -371,7 +384,7 @@ class VersionSelectionPopup:
     def scrollmenu(self, list):
         self.scrollmenu_window = tkinter.Toplevel()
         self.scrollmenu_window.geometry(f"{round(self.parent.winfo_x() / 2)}x{round(self.parent.winfo_y())}")
-        self.scrollmenu_window.geometry("+%d+%d" %(self.parent.winfo_pointerx(), self.parent.winfo_pointery()))
+        self.scrollmenu_window.geometry("+%d+%d" % (self.parent.winfo_pointerx(), self.parent.winfo_pointery()))
         self.scrollmenu_window.overrideredirect(True)
 
         self.scrollmenu_window.bind("<FocusOut>", self.quit)
@@ -393,8 +406,8 @@ class VersionSelectionPopup:
         self.scroll_canvas.create_window((0, 0), anchor="nw", window=options_frame)
 
         for i in range(len(list)):
-            button = tkinter.Button(options_frame, text=str(list[i]), border=0, anchor="w", 
-            command=partial(self.set_button_text, list[i])
+            button = tkinter.Button(
+                options_frame, text=str(list[i]), border=0, anchor="w", command=partial(self.set_button_text, list[i])
             )
             button.pack(fill="both")
 
@@ -423,16 +436,22 @@ class VersionSelectionPopup:
     
     def mousewheel_move(self, event):
         self.scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-            
+
+
 def update_login_button():
-    if launcher.check_login() == True:
+    if launcher.check_login():
         window.frames["SettingsPage"].login_button["text"] = "Logout"
     else:
         window.frames["SettingsPage"].login_button["text"] = "Login"
 
+
 if __name__ == "__main__":
+    CLIENT_ID = "Your Client ID"
+    SECRET = "Your Client Secret"
+    REDIRECT_URL = "http://localhost:8000/logged_in.html"
+
     window = Window()
-    launcher.refresh_login()
+    launcher.refresh_login(CLIENT_ID, REDIRECT_URL, SECRET)
     update_login_button()
     window.minsize(420, 270)
     window.mainloop()

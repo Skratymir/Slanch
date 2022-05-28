@@ -13,9 +13,6 @@ import socketserver
 
 from threading import Thread
 
-CLIENT_ID = "9ff1e48d-5b3c-42bb-883f-fd0426a583c4"
-SECRET = "7Hw8Q~1pfZRlrL2Pfo9QEF~cZahZw5pxhRDv0b0G"
-REDIRECT_URL = "http://localhost:8000/logged_in.html"
 minecraft_directory = minecraft_launcher_lib.utils.get_minecraft_directory()
 login_data = None
 logged_in = False
@@ -27,7 +24,7 @@ class GetURLHandler(http.server.SimpleHTTPRequestHandler):
         http.server.SimpleHTTPRequestHandler.do_GET(self)
         url = self.path
     
-def login():
+def login(CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in, login_data, url
     webbrowser.open(minecraft_launcher_lib.microsoft_account.get_login_url(CLIENT_ID, REDIRECT_URL))
     Handler = GetURLHandler
@@ -55,7 +52,7 @@ def logout():
     decrypt_login_data()
     os.remove("login.data")
 
-def refresh_login():
+def refresh_login(CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in, login_data
     try:
         if os.path.exists("login.encrypted"):
