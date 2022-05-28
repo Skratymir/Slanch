@@ -8,6 +8,7 @@ profiles/*
 # other stuff
 logs/
 test*.py
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
