@@ -1,6 +1,7 @@
 # Login information
 login.*
 *.key
+secret.json
 
 # profiles
 profiles/*

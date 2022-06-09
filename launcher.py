@@ -54,18 +54,21 @@ def logout():
 
 def refresh_login(CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in, login_data
+    print("Refreshing Login")
     try:
-        if os.path.exists("login.encrypted"):
+        if os.path.exists("data/login.encrypted"):
             decrypt_login_data()
-            with open("login.data", "rb") as f:
+            with open("data/login.data", "rb") as f:
                 login_data = pickle.load(f)
             encrypt_login_data()
             minecraft_launcher_lib.microsoft_account.complete_refresh(CLIENT_ID, SECRET, REDIRECT_URL, login_data["refresh_token"])
             print("Logged in as {}".format(login_data["name"]))
             logged_in = True
-    except FileNotFoundError:
-        print("No login data detected. Please login from the launcher")
-    except KeyError:
+        else:
+            print("No login data detected. Please login from the launcher")
+    except KeyError as e:
+        print("Login expired. Please login from the settings launcher")
+        print(login_data)
         logged_in = False
         
 def check_login():
@@ -143,7 +146,7 @@ def edit_profile(old_name, name, version, ram):
 def delete_profile(id):
     shutil.rmtree(f"profiles/{id}")
         
-def launch_profile(id):
+def launch_profile(id, CLIENT_ID, REDIRECT_URL, SECRET):
     for profile in load_all_profiles():
         if id == profile["id"]:
             minecraft_launch_options = {
@@ -158,14 +161,14 @@ def launch_profile(id):
                 minecraft_directory, 
                 minecraft_launch_options
             )
-            Thread(target=launch_minecraft, args=(profile, minecraft_directory, minecraft_launch_command)).start()
+            Thread(target=launch_minecraft, args=(profile, minecraft_directory, minecraft_launch_command, CLIENT_ID, REDIRECT_URL, SECRET)).start()
 
-def launch_minecraft(profile, minecraft_directory, minecraft_launch_command):
+def launch_minecraft(profile, minecraft_directory, minecraft_launch_command, CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in
     print("Verifying installation of version {}".format(profile["version"]))
     minecraft_launcher_lib.install.install_minecraft_version(profile["version"], minecraft_directory)
     print("Refreshing login")
-    refresh_login()
+    refresh_login(CLIENT_ID, REDIRECT_URL, SECRET)
     if logged_in == True:
         print("Refreshed Login. Starting Version {}".format(profile["version"]))
         copy_minecraft_files_from_profile(profile["id"])
@@ -211,15 +214,15 @@ def encrypt_login_data():
             key_file.write(key)
     with open("key.key", "r") as key_file:
         key = key_file.read()
-    pyAesCrypt.encryptFile("login.data", "login.encrypted", key)
-    os.remove("login.data")
+    pyAesCrypt.encryptFile("data/login.data", "data/login.encrypted", key)
+    os.remove("data/login.data")
     
 def decrypt_login_data():
     try:
         with open("key.key", "r") as key_file:
             key = key_file.read()
-        pyAesCrypt.decryptFile("login.encrypted", "login.data", key)
-        os.remove("login.encrypted")
+        pyAesCrypt.decryptFile("data/login.encrypted", "data/login.data", key)
+        os.remove("data/login.encrypted")
     except FileNotFoundError:
         print("Key file not found. Please log in again from the Settings Page")
 
