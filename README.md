@@ -21,15 +21,17 @@ The Settings Page:
 - Install any official Minecraft version (This includes snapshots, alpha, etc.)
 
 ## Still coming :hammer:
-([:hammer:]=Work in progress, [:x:]=Not yet started)
+(:hammer:= Work in progress, :x:= Not yet started)
 
-[:x:] Install Forge and Fabric
+:hammer: Improved security
 
-[:x:] Settings
+:x: Install Forge and Fabric
 
-[:x:] GUI Textures, colours
+:x: Settings
 
-[:hammer:] Better login confirmation website
+:x: GUI Textures, colours
+
+:hammer: Better login confirmation website
 
 ## How to build yourself
 [:hammer:] Coming after v1.0.0 is done! [:hammer:]

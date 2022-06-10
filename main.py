@@ -1,10 +1,14 @@
 import launcher
+import json
+import pyAesCrypt
+import io
 import tkinter
 import tkinter.messagebox
 
 from tkinter import font as tkFont
 from tkinter import ttk
 from functools import partial
+from os import stat
 
 
 class Window(tkinter.Tk):
@@ -446,9 +450,18 @@ def update_login_button():
 
 
 if __name__ == "__main__":
-    CLIENT_ID = "Your Client ID"
-    SECRET = "Your Client Secret"
     REDIRECT_URL = "http://localhost:8000/logged_in.html"
+
+    fCiph = io.BytesIO()
+    fDec = io.BytesIO()
+
+    with open("data/secret.json", "rb") as fIn:
+        encFileSize = stat("test.json").st_size
+        pyAesCrypt.decryptStream(fIn, fDec, "Any Password", 64 * 1024, encFileSize)
+
+    json_data = json.loads(fDec.getvalue())
+    CLIENT_ID = json_data["Client ID"]
+    SECRET = json_data["Secret"]
 
     window = Window()
     launcher.refresh_login(CLIENT_ID, REDIRECT_URL, SECRET)

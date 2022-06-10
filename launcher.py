@@ -18,12 +18,14 @@ login_data = None
 logged_in = False
 global url
 
+
 class GetURLHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         global url
         http.server.SimpleHTTPRequestHandler.do_GET(self)
         url = self.path
     
+
 def login(CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in, login_data, url
     webbrowser.open(minecraft_launcher_lib.microsoft_account.get_login_url(CLIENT_ID, REDIRECT_URL))
@@ -44,6 +46,7 @@ def login(CLIENT_ID, REDIRECT_URL, SECRET):
     print("Login sucessful")
     logged_in = True
     
+
 def logout():
     global logged_in, login_data
     print("Logging out...")
@@ -52,40 +55,47 @@ def logout():
     decrypt_login_data()
     os.remove("login.data")
 
+
 def refresh_login(CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in, login_data
+    print("Refreshing Login")
     try:
-        if os.path.exists("login.encrypted"):
+        if os.path.exists("data/login.encrypted"):
             decrypt_login_data()
-            with open("login.data", "rb") as f:
+            with open("data/login.data", "rb") as f:
                 login_data = pickle.load(f)
             encrypt_login_data()
             minecraft_launcher_lib.microsoft_account.complete_refresh(CLIENT_ID, SECRET, REDIRECT_URL, login_data["refresh_token"])
             print("Logged in as {}".format(login_data["name"]))
             logged_in = True
-    except FileNotFoundError:
-        print("No login data detected. Please login from the launcher")
+        else:
+            print("No login data detected. Please login from the launcher")
     except KeyError:
+        print("Login expired. Please login from the settings launcher")
         logged_in = False
-        
+
+
 def check_login():
     global logged_in, login_data
-    if logged_in and login_data != None:
+    if logged_in and login_data is not None:
         return True
     else:
         return False
     
+
 def get_login_data():
     if check_login():
         return login_data
     else:
         return False
     
+
 def load_all_installed_versions():
     versions = []
     for version in minecraft_launcher_lib.utils.get_installed_versions(minecraft_directory):
         versions.append(version["id"])
     return versions
+
 
 def load_all_available_versions():
     versions = []
@@ -93,12 +103,14 @@ def load_all_available_versions():
         versions.append(version["id"])
     return versions
 
+
 def load_all_release_versions():
     versions = []
     for version in minecraft_launcher_lib.utils.get_available_versions(minecraft_directory):
         if version["type"] == "release":
             versions.append(version["id"])
     return versions
+
 
 def load_all_profiles():
     profiles = []
@@ -109,6 +121,7 @@ def load_all_profiles():
                 profiles.append(profile)
     return profiles
 
+
 def load_all_profiles_by_name():
     profiles = []
     for object in os.scandir("./profiles"):
@@ -117,6 +130,7 @@ def load_all_profiles_by_name():
                 profile = pickle.load(f)
                 profiles.append(profile["id"])
     return profiles
+
 
 def create_new_profile(name, version, ram):
     os.mkdir(f"./profiles/{name}")
@@ -129,6 +143,7 @@ def create_new_profile(name, version, ram):
     with open(f"./profiles/{name}/profile.info", "wb") as f:
         pickle.dump(profile, f)
         
+
 def edit_profile(old_name, name, version, ram):
     os.rename(f"./profiles/{old_name}", f"./profiles/{name}")
     new_profile = {
@@ -143,7 +158,8 @@ def edit_profile(old_name, name, version, ram):
 def delete_profile(id):
     shutil.rmtree(f"profiles/{id}")
         
-def launch_profile(id):
+
+def launch_profile(id, CLIENT_ID, REDIRECT_URL, SECRET):
     for profile in load_all_profiles():
         if id == profile["id"]:
             minecraft_launch_options = {
@@ -154,25 +170,27 @@ def launch_profile(id):
             }
             print(profile["args"])
             minecraft_launch_command = minecraft_launcher_lib.command.get_minecraft_command(
-                profile["version"], 
-                minecraft_directory, 
+                profile["version"],
+                minecraft_directory,
                 minecraft_launch_options
             )
-            Thread(target=launch_minecraft, args=(profile, minecraft_directory, minecraft_launch_command)).start()
+            Thread(target=launch_minecraft, args=(profile, minecraft_directory, minecraft_launch_command, CLIENT_ID, REDIRECT_URL, SECRET)).start()
 
-def launch_minecraft(profile, minecraft_directory, minecraft_launch_command):
+
+def launch_minecraft(profile, minecraft_directory, minecraft_launch_command, CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in
     print("Verifying installation of version {}".format(profile["version"]))
     minecraft_launcher_lib.install.install_minecraft_version(profile["version"], minecraft_directory)
     print("Refreshing login")
-    refresh_login()
-    if logged_in == True:
+    refresh_login(CLIENT_ID, REDIRECT_URL, SECRET)
+    if logged_in:
         print("Refreshed Login. Starting Version {}".format(profile["version"]))
         copy_minecraft_files_from_profile(profile["id"])
         subprocess.call(minecraft_launch_command)
         restore_minecraft_options(profile["id"])
     else:
         print("Refresh unsucessful. Please login again from the settings page")
+
 
 def copy_minecraft_files_from_profile(profile_id):
     print("Backing files up")
@@ -194,6 +212,7 @@ def copy_minecraft_files_from_profile(profile_id):
     if os.path.exists(f"./profiles/{profile_id}/mods/"):
         shutil.copytree(f"./profiles/{profile_id}/mods/", minecraft_directory + "\\mods\\")
 
+
 def restore_minecraft_options(profile_id):
     print("Restoring files")
     for item in os.listdir(f"./profiles/{profile_id}/backup/"):
@@ -203,6 +222,7 @@ def restore_minecraft_options(profile_id):
     if os.path.exists(f"./profiles/{profile_id}/backup/mods/"):
         shutil.rmtree(f"./profiles/{profile_id}/backup/mods/")
     
+
 def encrypt_login_data():
     if not os.path.exists("key.key"):
         chars = string.printable
@@ -211,17 +231,19 @@ def encrypt_login_data():
             key_file.write(key)
     with open("key.key", "r") as key_file:
         key = key_file.read()
-    pyAesCrypt.encryptFile("login.data", "login.encrypted", key)
-    os.remove("login.data")
+    pyAesCrypt.encryptFile("data/login.data", "data/login.encrypted", key)
+    os.remove("data/login.data")
     
+
 def decrypt_login_data():
     try:
         with open("key.key", "r") as key_file:
             key = key_file.read()
-        pyAesCrypt.decryptFile("login.encrypted", "login.data", key)
-        os.remove("login.encrypted")
+        pyAesCrypt.decryptFile("data/login.encrypted", "data/login.data", key)
+        os.remove("data/login.encrypted")
     except FileNotFoundError:
         print("Key file not found. Please log in again from the Settings Page")
+
 
 def is_vanilla_version(version, all_versions):
     if version in all_versions:
