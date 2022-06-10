@@ -445,10 +445,12 @@ class VersionSelectionPopup:
 
         max_width = button.winfo_width()
         
-        self.scrollmenu_window.geometry(f"{round(max_width + max_width / 8)}x{round(self.parent.winfo_y())}")
+        self.scrollmenu_window.geometry(
+            f"{round(max_width + self.scrollmenu_window.winfo_screenwidth() / 100)}x{round(self.parent.winfo_y())}"
+        )
 
         scrollbar = tkinter.Scrollbar(self.scrollmenu_window, command=self.scroll_canvas.yview)
-        scrollbar.place(relx=0.9, rely=0, relheight=1, relwidth=0.1, anchor="nw")
+        scrollbar.place(relx=1, rely=0, relheight=1, width=self.scrollmenu_window.winfo_screenwidth() / 100, anchor="ne")
         self.scroll_canvas.config(yscrollcommand=scrollbar.set)
 
     def set_button_text(self, text):
