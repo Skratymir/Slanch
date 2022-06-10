@@ -13,7 +13,7 @@ import socketserver
 
 from threading import Thread
 
-minecraft_directory = minecraft_launcher_lib.utils.get_minecraft_directory()
+minecraft_directory = "./minecraft"
 login_data = None
 logged_in = False
 global url
@@ -25,6 +25,13 @@ class GetURLHandler(http.server.SimpleHTTPRequestHandler):
         http.server.SimpleHTTPRequestHandler.do_GET(self)
         url = self.path
     
+
+def setup_minecraft_directory():
+    if not os.path.exists("./minecraft"):
+        os.mkdir("./minecraft")
+    if not os.path.exists("./minecraft/versions"):
+        os.mkdir("./minecraft/versions")
+
 
 def login(CLIENT_ID, REDIRECT_URL, SECRET):
     global logged_in, login_data, url
