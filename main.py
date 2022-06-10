@@ -2,7 +2,6 @@ import launcher
 import json
 import pyAesCrypt
 import io
-import os
 import tkinter
 import tkinter.messagebox
 
