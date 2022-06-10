@@ -2,6 +2,7 @@ import launcher
 import json
 import pyAesCrypt
 import io
+import os
 import tkinter
 import tkinter.messagebox
 
@@ -72,7 +73,9 @@ class LaunchPage(tkinter.Frame):
         self.profiles_page_button.place(relx=0.33, rely=0, relwidth=0.34, relheight=0.15, anchor="nw")
         self.settings_page_button.place(relx=1, rely=0, relwidth=0.33, relheight=0.15, anchor="ne")
         
-        self.launch_button = tkinter.Button(self, text="Launch", command=lambda: launcher.launch_profile(self.variable.get()))
+        self.launch_button = tkinter.Button(self, text="Launch", command=lambda: launcher.launch_profile(
+            self.variable.get(), CLIENT_ID, REDIRECT_URL, SECRET
+        ))
         
         self.options = launcher.load_all_profiles_by_name()
         self.variable = tkinter.StringVar(self)
@@ -136,7 +139,7 @@ class ProfilesPage(tkinter.Frame):
             self.frame.pack(side="bottom", anchor="w", fill="both", expand=True)
             self.profile_frames.append(self.frame)
         self.frame = tkinter.Frame(self.profiles_frame)
-        tkinter.Button(self.frame, text="Create new Profile", command=lambda: self.controller.set_page("ProfileCreationPage")).pack()
+        tkinter.Button(self.frame, text="Create new Profile", command=lambda: self.create_profile()).pack()
         self.frame.pack(side="bottom", anchor="w", fill="both", expand=True)
         
     def delete_profile(self, id):
@@ -162,6 +165,14 @@ class ProfilesPage(tkinter.Frame):
                 self.controller.frames["ProfileEditingPage"].profile_ram_input.set(profile["args"][0][4:5])
         
         self.controller.set_page("ProfileEditingPage")
+
+    def create_profile(self):
+        if launcher.load_all_installed_versions() == []:
+            tkinter.messagebox.showwarning(
+                "Installation Error", "You have no version of minecraft installed! Please install minecraft from the settings tab."
+            )
+        else:
+            self.controller.set_page("ProfileCreationPage")
 
 
 class SettingsPage(tkinter.Frame):
@@ -197,16 +208,18 @@ class ProfileCreationPage(tkinter.Frame):
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
         
-        all_installed_versions = launcher.load_all_installed_versions()
+        self.all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
-        self.selected_version.set(all_installed_versions[0])
+        if self.all_installed_versions == []:
+            self.all_installed_versions.append("No versions installed")
+        self.selected_version.set(self.all_installed_versions[0])
         
         self.title_label = tkinter.Label(self, text="Create Profile")
         self.profile_name_label = tkinter.Label(self, text="Profile name")
         self.profile_version_label = tkinter.Label(self, text="Version")
         self.profile_ram_label = tkinter.Label(self, text="Allocated RAM")
         self.profile_name_input = tkinter.Entry(self)
-        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
+        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *self.all_installed_versions)
         self.profile_ram_input = tkinter.Scale(self, from_=1, to=8, orient="horizontal")
         self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
         
@@ -261,6 +274,8 @@ class ProfileEditingPage(tkinter.Frame):
         
         self.all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
+        if self.all_installed_versions == []:
+            self.all_installed_versions.append("No versions installed")
         self.selected_version.set(self.all_installed_versions[0])
         
         self.title_label = tkinter.Label(self, text="Edit Profile")
@@ -366,6 +381,17 @@ class InstallationPage(tkinter.Frame):
         }
 
         launcher.minecraft_launcher_lib.install.install_minecraft_version(version, launcher.minecraft_directory, callback=callback)
+        self.controller.frames["ProfileCreationPage"].all_installed_versions = launcher.load_all_installed_versions()
+        self.controller.frames["ProfileCreationPage"].profile_version_dropdown.place_forget()
+        self.controller.frames["ProfileCreationPage"].profile_version_dropdown = tkinter.OptionMenu(
+            self.controller.frames["ProfileCreationPage"],
+            self.controller.frames["ProfileCreationPage"].selected_version,
+            *self.controller.frames["ProfileCreationPage"].all_installed_versions
+        )
+        self.controller.frames["ProfileCreationPage"].profile_version_dropdown.place(
+            relx=0.5, rely=0.5, relwidth=0.4, relheight=0.1, anchor="nw"
+        )
+        self.controller.set_page("LaunchPage")
 
     def set_maximum_progressvalue(self, value):
         self.install_progressbar["maximum"] = value
@@ -450,6 +476,8 @@ def update_login_button():
 
 
 if __name__ == "__main__":
+    launcher.setup_minecraft_directory()
+
     REDIRECT_URL = "http://localhost:8000/logged_in.html"
 
     fCiph = io.BytesIO()

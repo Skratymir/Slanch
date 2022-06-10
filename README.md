@@ -23,7 +23,7 @@ The Settings Page:
 ## Still coming :hammer:
 (:hammer:= Work in progress, :x:= Not yet started)
 
-:hammer: Improved security
+:hammer: Build instructions
 
 :x: Install Forge and Fabric
 

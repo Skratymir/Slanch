@@ -3,10 +3,13 @@ login.*
 *.key
 secret.json
 
-# profiles
+# Profiles
 profiles/*
 
-# other stuff
+# Minecraft files
+minecraft/
+
+# Other stuff
 logs/
 test*.*
 .vscode
