@@ -208,18 +208,18 @@ class ProfileCreationPage(tkinter.Frame):
         tkinter.Frame.__init__(self, parent)
         self.controller = controller
         
-        all_installed_versions = launcher.load_all_installed_versions()
+        self.all_installed_versions = launcher.load_all_installed_versions()
         self.selected_version = tkinter.StringVar(self)
-        if all_installed_versions == []:
-            all_installed_versions.append("No versions installed")
-        self.selected_version.set(all_installed_versions[0])
+        if self.all_installed_versions == []:
+            self.all_installed_versions.append("No versions installed")
+        self.selected_version.set(self.all_installed_versions[0])
         
         self.title_label = tkinter.Label(self, text="Create Profile")
         self.profile_name_label = tkinter.Label(self, text="Profile name")
         self.profile_version_label = tkinter.Label(self, text="Version")
         self.profile_ram_label = tkinter.Label(self, text="Allocated RAM")
         self.profile_name_input = tkinter.Entry(self)
-        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *all_installed_versions)
+        self.profile_version_dropdown = tkinter.OptionMenu(self, self.selected_version, *self.all_installed_versions)
         self.profile_ram_input = tkinter.Scale(self, from_=1, to=8, orient="horizontal")
         self.profile_creation_button = tkinter.Button(self, text="Create", command=self.launcher_create_profile)
         
@@ -381,6 +381,17 @@ class InstallationPage(tkinter.Frame):
         }
 
         launcher.minecraft_launcher_lib.install.install_minecraft_version(version, launcher.minecraft_directory, callback=callback)
+        self.controller.frames["ProfileCreationPage"].all_installed_versions = launcher.load_all_installed_versions()
+        self.controller.frames["ProfileCreationPage"].profile_version_dropdown.place_forget()
+        self.controller.frames["ProfileCreationPage"].profile_version_dropdown = tkinter.OptionMenu(
+            self.controller.frames["ProfileCreationPage"],
+            self.controller.frames["ProfileCreationPage"].selected_version,
+            *self.controller.frames["ProfileCreationPage"].all_installed_versions
+        )
+        self.controller.frames["ProfileCreationPage"].profile_version_dropdown.place(
+            relx=0.5, rely=0.5, relwidth=0.4, relheight=0.1, anchor="nw"
+        )
+        self.controller.set_page("LaunchPage")
 
     def set_maximum_progressvalue(self, value):
         self.install_progressbar["maximum"] = value
