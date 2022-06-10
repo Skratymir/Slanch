@@ -3,8 +3,9 @@ login.*
 *.key
 secret.json
 
-# profiles
+# Minecraft stuff
 profiles/*
+minecraft/
 
 # other stuff
 logs/
