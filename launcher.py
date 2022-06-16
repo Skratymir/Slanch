@@ -252,7 +252,11 @@ def decrypt_login_data():
                 fDec = io.BytesIO()
 
                 pyAesCrypt.decryptStream(fIn, fDec, key, 64 * 1024, stat("data/login.encrypted").st_size)
-                return pickle.loads(fDec.getvalue())
+                login_data_pckl = pickle.loads(fDec.getvalue())
+                if type(login_data_pckl) == dict:
+                    return login_data_pckl
+                else:
+                    return False
     except FileNotFoundError:
         print("Key file not found. Please log in again from the Settings Page")
 
