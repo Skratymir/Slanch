@@ -485,7 +485,7 @@ if __name__ == "__main__":
     fDec = io.BytesIO()
 
     with open("data/secret.json", "rb") as fIn:
-        encFileSize = stat("test.json").st_size
+        encFileSize = stat("data/secret.json").st_size
         pyAesCrypt.decryptStream(fIn, fDec, "Any Password", 64 * 1024, encFileSize)
 
     json_data = json.loads(fDec.getvalue())

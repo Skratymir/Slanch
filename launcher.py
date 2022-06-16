@@ -10,8 +10,10 @@ import shutil
 import http.server
 import webbrowser
 import socketserver
+import io
 
 from threading import Thread
+from os import stat
 
 minecraft_directory = "./minecraft"
 login_data = None
@@ -47,9 +49,9 @@ def login(CLIENT_ID, REDIRECT_URL, SECRET):
         
     auth_code = minecraft_launcher_lib.microsoft_account.get_auth_code_from_url(code_url)
     login_data = minecraft_launcher_lib.microsoft_account.complete_login(CLIENT_ID, SECRET, REDIRECT_URL, auth_code)
-    with open("login.data", "wb") as f:
-        pickle.dump(login_data, f)
-    encrypt_login_data()
+
+    encrypt_login_data(login_data)
+
     print("Login sucessful")
     logged_in = True
     
@@ -59,8 +61,8 @@ def logout():
     print("Logging out...")
     logged_in = False
     login_data = None
-    decrypt_login_data()
-    os.remove("login.data")
+    if os.path.exists("data/login.encrypted"):
+        os.remove("data/login.encrypted")
 
 
 def refresh_login(CLIENT_ID, REDIRECT_URL, SECRET):
@@ -68,10 +70,7 @@ def refresh_login(CLIENT_ID, REDIRECT_URL, SECRET):
     print("Refreshing Login")
     try:
         if os.path.exists("data/login.encrypted"):
-            decrypt_login_data()
-            with open("data/login.data", "rb") as f:
-                login_data = pickle.load(f)
-            encrypt_login_data()
+            login_data = decrypt_login_data()
             minecraft_launcher_lib.microsoft_account.complete_refresh(CLIENT_ID, SECRET, REDIRECT_URL, login_data["refresh_token"])
             print("Logged in as {}".format(login_data["name"]))
             logged_in = True
@@ -230,24 +229,30 @@ def restore_minecraft_options(profile_id):
         shutil.rmtree(f"./profiles/{profile_id}/backup/mods/")
     
 
-def encrypt_login_data():
+def encrypt_login_data(login_data):
     if not os.path.exists("key.key"):
         chars = string.printable
         key = "".join(random.choice(chars) for i in range(256))
         with open("key.key", "w") as key_file:
             key_file.write(key)
+
+    pckl = pickle.dumps(login_data)
+    fIn = io.BytesIO(pckl)
     with open("key.key", "r") as key_file:
-        key = key_file.read()
-    pyAesCrypt.encryptFile("data/login.data", "data/login.encrypted", key)
-    os.remove("data/login.data")
+        with open("data/login.encrypted", "wb") as fOut:
+            key = key_file.read()
+            pyAesCrypt.encryptStream(fIn, fOut, key, 64 * 1024)
     
 
 def decrypt_login_data():
     try:
         with open("key.key", "r") as key_file:
-            key = key_file.read()
-        pyAesCrypt.decryptFile("data/login.encrypted", "data/login.data", key)
-        os.remove("data/login.encrypted")
+            with open ("data/login.encrypted", "rb") as fIn:
+                key = key_file.read()
+                fDec = io.BytesIO()
+
+                pyAesCrypt.decryptStream(fIn, fDec, key, 64 * 1024, stat("data/login.encrypted").st_size)
+                return pickle.loads(fDec.getvalue())
     except FileNotFoundError:
         print("Key file not found. Please log in again from the Settings Page")
 
