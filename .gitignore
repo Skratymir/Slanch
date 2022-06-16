@@ -13,6 +13,7 @@ minecraft/
 logs/
 test*.*
 .vscode
+build.bat
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
