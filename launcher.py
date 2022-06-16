@@ -120,21 +120,27 @@ def load_all_release_versions():
 
 def load_all_profiles():
     profiles = []
-    for object in os.scandir("./profiles"):
-        if object.is_dir():
-            with open(f"./profiles/{object.name}/profile.info", "rb") as f:
-                profile = pickle.load(f)
-                profiles.append(profile)
+    if os.path.exists("./profiles"):
+        for object in os.scandir("./profiles"):
+            if object.is_dir():
+                with open(f"./profiles/{object.name}/profile.info", "rb") as f:
+                    profile = pickle.load(f)
+                    profiles.append(profile)
+    else:
+        os.mkdir("./profiles")
     return profiles
 
 
 def load_all_profiles_by_name():
     profiles = []
-    for object in os.scandir("./profiles"):
-        if object.is_dir():
-            with open(f"./profiles/{object.name}/profile.info", "rb") as f:
-                profile = pickle.load(f)
-                profiles.append(profile["id"])
+    if os.path.exists("./profiles"):
+        for object in os.scandir("./profiles"):
+            if object.is_dir():
+                with open(f"./profiles/{object.name}/profile.info", "rb") as f:
+                    profile = pickle.load(f)
+                    profiles.append(profile["id"])
+    else:
+        os.mkdir("./profiles")
     return profiles
 
 
