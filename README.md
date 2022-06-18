@@ -34,7 +34,34 @@ The Settings Page:
 :hammer: Better login confirmation website
 
 ## How to build yourself
-[:hammer:] Coming after v1.0.0 is done! [:hammer:]
+### Prerequisites:
+- Python (Only tested with Python 3.8.10, 3.7 upwards should work)
+- Windows (Only tested with Windows 11, 7 upwards should work)
+- Azure Application
+
+### Setup
+Create a new venv
+~~~
+python -m venv ./.venv
+~~~
+
+Activate the venv
+~~~
+./.venv/Scripts/activate
+~~~
+
+Install dependencies
+~~~python
+pip install -r requirements.txt
+~~~
+
+### Build the exe
+To build the exe, just follow the instructions of the build.py file
+~~~python
+python build.py
+~~~
+When asked for your Client ID and Secret, paste in the Client ID of your Azure Application, as well as the secret of your Application
+
 \
 &nbsp;
 # :exclamation: Important Note :exclamation:
