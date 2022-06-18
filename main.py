@@ -483,10 +483,10 @@ if __name__ == "__main__":
 
     fCiph = io.BytesIO()
     fDec = io.BytesIO()
-
-    with open("data/secret.json", "rb") as fIn:
-        encFileSize = stat("data/secret.json").st_size
-        pyAesCrypt.decryptStream(fIn, fDec, "Any Password", 64 * 1024, encFileSize)
+    with open("key.key", "r") as key:
+        with open("data/secret.json", "rb") as fIn:
+            encFileSize = stat("data/secret.json").st_size
+            pyAesCrypt.decryptStream(fIn, fDec, key.read(), 64 * 1024, encFileSize)
 
     json_data = json.loads(fDec.getvalue())
     CLIENT_ID = json_data["Client ID"]
