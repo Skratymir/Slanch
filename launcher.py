@@ -236,15 +236,9 @@ def restore_minecraft_options(profile_id):
     
 
 def encrypt_login_data(login_data):
-    if not os.path.exists("key.key"):
-        chars = string.printable
-        key = "".join(random.choice(chars) for i in range(256))
-        with open("key.key", "w") as key_file:
-            key_file.write(key)
-
     pckl = pickle.dumps(login_data)
     fIn = io.BytesIO(pckl)
-    with open("key.key", "r") as key_file:
+    with open("data/key.key", "r") as key_file:
         with open("data/login.encrypted", "wb") as fOut:
             key = key_file.read()
             pyAesCrypt.encryptStream(fIn, fOut, key, 64 * 1024)
@@ -252,7 +246,7 @@ def encrypt_login_data(login_data):
 
 def decrypt_login_data():
     try:
-        with open("key.key", "r") as key_file:
+        with open("data/key.key", "r") as key_file:
             with open ("data/login.encrypted", "rb") as fIn:
                 key = key_file.read()
                 fDec = io.BytesIO()
