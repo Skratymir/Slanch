@@ -40,6 +40,16 @@ The Settings Page:
 - Azure Application
 
 ### Setup
+Clone the git
+~~~
+git clone https://github.com/Skratymir/Slanch.git
+~~~
+
+Change directory to source folder
+~~~
+cd Slanch
+~~~
+
 Create a new venv
 ~~~
 python -m venv ./.venv
