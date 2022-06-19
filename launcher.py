@@ -3,8 +3,6 @@ import sys
 import pickle
 import os
 import subprocess
-import random
-import string
 import pyAesCrypt
 import shutil
 import http.server
@@ -247,7 +245,7 @@ def encrypt_login_data(login_data):
 def decrypt_login_data():
     try:
         with open("data/key.key", "r") as key_file:
-            with open ("data/login.encrypted", "rb") as fIn:
+            with open("data/login.encrypted", "rb") as fIn:
                 key = key_file.read()
                 fDec = io.BytesIO()
 

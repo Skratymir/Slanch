@@ -1,9 +1,12 @@
-import os, shutil, sys
+import os
+import shutil
+import sys
 import pyAesCrypt
 import string
 import random
 import io
 import subprocess
+
 
 def yes_no(text: str) -> bool:
     if "-y" in sys.argv:
@@ -19,6 +22,7 @@ def yes_no(text: str) -> bool:
         else:
             continue
 
+
 if not yes_no("This programm will now begin the building process. \nDo you wish to continue?"):
     quit()
 client_id = input("Please enter your Client ID:\n")
@@ -28,7 +32,7 @@ if os.path.exists("./dist"):
     if not yes_no('The building process will delete all contents of the "dist" folder. \nDo you wish to continue?'):
         quit()
     shutil.rmtree("./dist")
-subprocess.call([".venv\Scripts\pyinstaller.exe", "Slanch.spec", "-y"])
+subprocess.call([".venv/Scripts/pyinstaller.exe", "Slanch.spec", "-y"])
 os.mkdir("dist/Slanch/data/")
 
 with open("dist/Slanch/data/key.key", "w") as key_file:
